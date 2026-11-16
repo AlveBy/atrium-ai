@@ -131,7 +131,7 @@ final class GenerateTest extends TestCase
             'values' => ['detail_text' => 'Ein Hotel am See.'],
         ])->assertJsonPath('value', 'Kurzer Text.');
 
-        Writer::assertPrompted(fn (AgentPrompt $prompt): bool => str_contains($prompt->agent->instructions(), 'Write in Deutsch (de)'));
+        Writer::assertPrompted(fn (AgentPrompt $prompt): bool => str_contains($prompt->agent->instructions(), 'Write in German (Deutsch, de)'));
     }
 
     public function test_a_translatable_field_is_translated_into_the_other_languages(): void
@@ -149,7 +149,7 @@ final class GenerateTest extends TestCase
             'values' => ['preview_text' => ['en' => 'Lake hotel', 'de' => '', 'fr' => '']],
         ])->assertJsonPath('values', ['de' => 'Hotel am See', 'fr' => 'Hôtel au bord du lac']);
 
-        Writer::assertPrompted(fn (AgentPrompt $prompt): bool => str_contains($prompt->prompt, 'into Deutsch (de)') && str_contains($prompt->prompt, 'Lake hotel'));
+        Writer::assertPrompted(fn (AgentPrompt $prompt): bool => str_contains($prompt->prompt, 'into German (Deutsch, de)') && str_contains($prompt->prompt, 'Lake hotel'));
         $this->assertSame(2, Usage::query()->count());
     }
 

@@ -63,7 +63,7 @@ The fields are read as they are in the form now, not as saved, so a new record w
 
 **Translate** shows on a translatable field when the site has more than one content language. It translates the language being edited into every other one and shows them all in the dialog. A language cleared there keeps its old text.
 
-The answer is in the language being edited, whatever the language of the source.
+The answer is in the language being edited, whatever the language of the source. The model is told that language in English, with the script where it could guess wrong: "Uzbek in Latin script (Oʻzbekcha, uz)", "Kazakh in Cyrillic script (Қазақша, kk)". All fifteen Atrium languages are named that way; any other keeps the name it has under **Languages**.
 
 ## Providers and the fallback chain
 
@@ -120,7 +120,7 @@ Each task's prompt is a Blade view. Publish them and edit:
 php artisan vendor:publish --tag=atrium-ai-prompts
 ```
 
-They land in `resources/views/vendor/atrium-ai/prompts`. Or point a task at a view of your own in `config/atrium-ai.php` → `prompts`. A view gets `$field` (the field's label), `$sources` (label → text), `$text` (all of them as one text), `$language` ("English (en)"), `$html`, `$limit` and, for `translate`, `$target`. `system` is the instruction every task starts with.
+They land in `resources/views/vendor/atrium-ai/prompts`. Or point a task at a view of your own in `config/atrium-ai.php` → `prompts`. A view gets `$field` (the field's label), `$sources` (label → text), `$text` (all of them as one text), `$language` ("English (en)", "Uzbek in Latin script (Oʻzbekcha, uz)"), `$html`, `$limit` and, for `translate`, `$target`. `system` is the instruction every task starts with.
 
 ## API and MCP
 

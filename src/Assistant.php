@@ -129,9 +129,7 @@ final class Assistant
 
     private function languageName(string $code): string
     {
-        $name = $this->languages->find($code)?->name;
-
-        return $name !== null && $name !== '' && $name !== $code ? "{$name} ({$code})" : $code;
+        return LanguageNames::describe($code, $this->languages->find($code)?->name);
     }
 
     private function log(Brief $brief, int|float $started, ?AgentResponse $response): void

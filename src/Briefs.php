@@ -93,7 +93,7 @@ final class Briefs
         $source = $this->text($values[$field->getName()] ?? null, $language, $common['format'] === 'html', strict: true);
         $targets = $this->languages->all()
             ->reject(fn ($item): bool => $item->code === $language)
-            ->mapWithKeys(fn ($item): array => [$item->code => $item->name !== '' ? "{$item->name} ({$item->code})" : $item->code])
+            ->mapWithKeys(fn ($item): array => [$item->code => LanguageNames::describe($item->code, $item->name)])
             ->all();
 
         if ($source === '' || $targets === []) {

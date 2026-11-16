@@ -25,7 +25,11 @@ final class Generate implements ShouldQueue
 
     public int $timeout = 300;
 
-    public function __construct(public readonly string $id, public readonly Brief $brief) {}
+    public function __construct(public readonly string $id, public readonly Brief $brief)
+    {
+        // A translation asks once per language: fifteen languages are fourteen calls.
+        $this->timeout = max($this->timeout, (count($brief->targets) + 1) * (int) config('atrium-ai.timeout', 60));
+    }
 
     public function handle(Assistant $assistant, Results $results): void
     {

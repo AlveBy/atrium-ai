@@ -47,7 +47,7 @@ final class LanguagesTest extends TestCase
     }
 
     #[DataProvider('locales')]
-    public function test_the_language_has_every_string_of_english_and_nothing_else(string $locale): void
+    public function test_the_language_has_every_string_of_english_and_nothing_else(string $locale, string $name): void
     {
         $english = $this->strings('en');
         $own = $this->strings($locale);

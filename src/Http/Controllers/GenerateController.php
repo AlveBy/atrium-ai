@@ -97,7 +97,9 @@ final class GenerateController extends Controller
 
         if ($connection === null || $connection === '') {
             app()->terminating(static function () use ($job): void {
-                if (function_exists('set_time_limit')) {
+                // Not in tests: the whole suite is one process, and the
+                // limit would stop it 300 seconds later.
+                if (function_exists('set_time_limit') && ! app()->runningUnitTests()) {
                     @set_time_limit($job->timeout);
                 }
 

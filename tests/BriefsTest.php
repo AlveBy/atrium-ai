@@ -130,6 +130,17 @@ final class BriefsTest extends TestCase
         $this->assertSame(realpath($file), app(Images::class)->local('/storage/ai-brief/LAKE.PNG'));
     }
 
+    public function test_a_scheme_is_read_in_capitals_and_only_at_the_start(): void
+    {
+        $file = $this->picture(public_path('storage/ai-brief/lake.png'));
+        Storage::fake('public');
+        Storage::disk('public')->put('uploads/lake.png', (string) base64_decode(self::PIXEL));
+
+        $this->assertSame(realpath($file), app(Images::class)->local('HTTP://LOCALHOST/storage/ai-brief/lake.png'));
+        // Two slashes inside a path are not an address.
+        $this->assertSame(realpath(Storage::disk('public')->path('uploads/lake.png')), app(Images::class)->local('uploads//lake.png'));
+    }
+
     public function test_a_picture_on_the_public_disk_is_read_by_its_path(): void
     {
         Storage::fake('public');

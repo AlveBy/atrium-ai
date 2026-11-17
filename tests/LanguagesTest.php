@@ -142,6 +142,9 @@ final class LanguagesTest extends TestCase
         $this->assertSame(15 * 60, (new Generate('id', $brief))->timeout);
         config(['atrium-ai.timeout' => 100]);
         $this->assertSame(15 * 100, (new Generate('id', $brief))->timeout);
+        // A time from the .env comes as text, or with a decimal point.
+        config(['atrium-ai.timeout' => '90.5']);
+        $this->assertSame(15 * 90, (new Generate('id', $brief))->timeout);
     }
 
     /** "pt_BR" of the panel is the content language "pt-br". */

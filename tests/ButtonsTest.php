@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 namespace Atrium\Ai\Tests;
 
+use Atrium\Ai\AiServiceProvider;
 use Atrium\Ai\Tests\Fixtures\Article;
+use Illuminate\Support\ServiceProvider;
 
 /**
  * Whether the admin draws the buttons at all.
@@ -50,6 +52,8 @@ final class ButtonsTest extends TestCase
 
         $this->assertNotContains('alt', $page['props']['ai']['tasks']);
         $this->assertContains('translate', $page['props']['ai']['tasks']);
+        // A list, not a list with a gap where the task was.
+        $this->assertSame(['describe', 'preview', 'seo_title', 'seo_description', 'seo_keywords', 'translate'], $page['props']['ai']['tasks']);
     }
 
     public function test_switched_off_no_buttons(): void
@@ -60,5 +64,23 @@ final class ButtonsTest extends TestCase
 
         $this->assertNull($page['props']['ai']);
         $this->assertSame(0, Article::query()->count());
+    }
+
+    public function test_the_config_and_the_prompts_can_be_published(): void
+    {
+        $config = ServiceProvider::pathsToPublish(AiServiceProvider::class, 'atrium-ai-config');
+        $prompts = ServiceProvider::pathsToPublish(AiServiceProvider::class, 'atrium-ai-prompts');
+
+        $this->assertSame([realpath(__DIR__.'/../config/atrium-ai.php') => config_path('atrium-ai.php')], $this->resolved($config));
+        $this->assertSame([realpath(__DIR__.'/../resources/views/prompts') => resource_path('views/vendor/atrium-ai/prompts')], $this->resolved($prompts));
+    }
+
+    /**
+     * @param  array<string,string>  $paths
+     * @return array<string,string>
+     */
+    private function resolved(array $paths): array
+    {
+        return array_combine(array_map(realpath(...), array_keys($paths)), array_values($paths));
     }
 }

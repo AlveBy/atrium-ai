@@ -112,6 +112,17 @@ final class BriefsTest extends TestCase
         $this->assertNull(app(Images::class)->local('https://cdn.example.org/storage/ai-brief/lake.png'));
     }
 
+    public function test_the_host_of_the_app_url_and_the_host_asked_are_both_this_server_in_any_case(): void
+    {
+        $file = $this->picture(public_path('storage/ai-brief/lake.png'));
+        config(['app.url' => 'https://Shop.Example.com']);
+
+        $this->assertSame(realpath($file), app(Images::class)->local('https://shop.example.com/storage/ai-brief/lake.png'));
+        $this->assertSame(realpath($file), app(Images::class)->local('https://SHOP.EXAMPLE.COM/storage/ai-brief/lake.png'));
+        $this->assertSame(realpath($file), app(Images::class)->local('http://LOCALHOST/storage/ai-brief/lake.png'));
+        $this->assertNull(app(Images::class)->local('https://example.com/storage/ai-brief/lake.png'));
+    }
+
     public function test_a_picture_on_the_public_disk_is_read_by_its_path(): void
     {
         Storage::fake('public');

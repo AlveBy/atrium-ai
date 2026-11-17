@@ -125,7 +125,7 @@ final class AssistantTest extends TestCase
         Writer::fake(['A cosy hotel.']);
         $this->dropTheUsageLog();
 
-        $result = app(Assistant::class)->generate($this->brief());
+        $result = $this->expectingAFailedStatement(fn () => app(Assistant::class)->generate($this->brief()));
 
         $this->assertSame('A cosy hotel.', $result->value);
         $this->assertSame('gemini', $result->provider);

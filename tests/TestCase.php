@@ -15,6 +15,8 @@ use Atrium\Admin\Models\AdminUser;
 use Atrium\Ai\AiServiceProvider;
 use Atrium\Ai\Tests\Fixtures\Article;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Inertia\ServiceProvider as InertiaServiceProvider;
 use Laravel\Ai\AiServiceProvider as SdkServiceProvider;
 use Laravel\Mcp\Server\McpServiceProvider;
@@ -74,6 +76,36 @@ abstract class TestCase extends Orchestra
         set_time_limit(0);
 
         parent::tearDown();
+    }
+
+    /**
+     * The config as if the key were missing (the code's own default applies).
+     */
+    protected function forgetConfig(string $key): void
+    {
+        $all = config()->all();
+        Arr::forget($all, $key);
+        config()->set($all);
+    }
+
+    /**
+     * PostgreSQL ends the whole transaction of a test at a failed statement;
+     * a savepoint around the statement that is meant to fail lets the test
+     * (and the roll back after it) go on. The other databases need none.
+     */
+    protected function expectingAFailedStatement(callable $run): mixed
+    {
+        if (DB::getDriverName() !== 'pgsql') {
+            return $run();
+        }
+
+        DB::beginTransaction();
+
+        try {
+            return $run();
+        } finally {
+            DB::rollBack();
+        }
     }
 
     protected function defineDatabaseMigrations(): void

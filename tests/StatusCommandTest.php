@@ -60,6 +60,10 @@ final class StatusCommandTest extends TestCase
         $yesterday = Usage::query()->create(['task' => 'describe', 'provider' => 'groq', 'input_tokens' => 3, 'output_tokens' => 4, 'duration_ms' => 50]);
         $yesterday->forceFill(['created_at' => now()->subDays(2)])->save();
 
+        foreach ([50, 51] as $milliseconds) {
+            Usage::query()->create(['task' => 'describe', 'provider' => 'groq', 'duration_ms' => $milliseconds])->forceFill(['created_at' => now()->subDays(2)])->save();
+        }
+
         $tonight = Usage::query()->create(['task' => 'describe', 'provider' => 'ollama', 'duration_ms' => 9]);
         $tonight->forceFill(['created_at' => now()->subHours(12)])->save();
 
@@ -67,8 +71,10 @@ final class StatusCommandTest extends TestCase
 
         $this->assertMatchesRegularExpression('/\| \(none answered\) +\| 1 +\| 1 +\| 0 +\| 0 +\| 7 +\|/', $output);
         $this->assertMatchesRegularExpression('/\| gemini +\| 2 +\| 1 +\| 15 +\| 20 +\| 151 +\|/', $output);
-        $this->assertMatchesRegularExpression('/\| groq +\| 1 +\| 0 +\| 3 +\| 4 +\| 50 +\|/', $output);
+        $this->assertMatchesRegularExpression('/\| groq +\| 3 +\| 0 +\| 3 +\| 4 +\| 50 +\|/', $output);
         $this->assertStringNotContainsString('99', $output);
+        $this->assertMatchesRegularExpression('/\| Kind +\| Provider +\| Model +\| Used +\|/', $output);
+        $this->assertMatchesRegularExpression('/\| Provider +\| Calls +\| Failed +\| Input tokens +\| Output tokens +\| Avg ms +\|/', $output);
 
         // A shorter period, and never less than a day.
         // The chains above list groq too: only a row with numbers is usage.
@@ -82,7 +88,7 @@ final class StatusCommandTest extends TestCase
     {
         $this->dropTheUsageLog();
 
-        $output = $this->runStatus();
+        $output = $this->expectingAFailedStatement(fn () => $this->runStatus());
 
         $this->assertStringContainsString('No usage log yet: run php artisan atrium:module:install alveby/atrium-ai.', $output);
         $this->assertStringNotContainsString('Avg ms', $output);

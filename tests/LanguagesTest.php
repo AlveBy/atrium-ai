@@ -87,6 +87,23 @@ final class LanguagesTest extends TestCase
         $this->assertSame('fi', LanguageNames::describe('fi', ''));
     }
 
+    public function test_the_code_is_read_in_any_case_with_a_dash_or_an_underscore(): void
+    {
+        $this->assertSame('Uzbek in Cyrillic script (Ўзбекча, UZ_CYRL)', LanguageNames::describe('UZ_CYRL', 'Ўзбекча'));
+        $this->assertSame('Uzbek in Cyrillic script (UZ-CYRL)', LanguageNames::describe('UZ-CYRL'));
+        $this->assertSame('Brazilian Portuguese (pt_BR)', LanguageNames::describe('pt_BR'));
+        // Only the first dash splits the code: what follows is the script.
+        $this->assertSame('Uzbek in Latin script (uz-cyrl-x)', LanguageNames::describe('uz-cyrl-x'));
+    }
+
+    public function test_the_name_the_site_gave_is_trimmed_and_ignored_when_blank(): void
+    {
+        $this->assertSame('Suomi (fi)', LanguageNames::describe('fi', '  Suomi  '));
+        $this->assertSame('fi', LanguageNames::describe('fi', '   '));
+        $this->assertSame('German (Deutsch, de)', LanguageNames::describe('de', '  Deutsch '));
+        $this->assertSame('German (de)', LanguageNames::describe('de', '   '));
+    }
+
     public function test_a_field_is_translated_into_each_of_the_other_fourteen_languages(): void
     {
         foreach (self::locales() as [$locale, $name]) {
@@ -120,6 +137,11 @@ final class LanguagesTest extends TestCase
 
         $this->assertSame(15 * 60, (new Generate('id', $brief))->timeout);
         $this->assertSame(300, (new Generate('id', new Brief(Task::Describe, 'en', ['Text' => 'x'], field: 'Text')))->timeout);
+
+        $this->forgetConfig('atrium-ai.timeout');
+        $this->assertSame(15 * 60, (new Generate('id', $brief))->timeout);
+        config(['atrium-ai.timeout' => 100]);
+        $this->assertSame(15 * 100, (new Generate('id', $brief))->timeout);
     }
 
     /** "pt_BR" of the panel is the content language "pt-br". */

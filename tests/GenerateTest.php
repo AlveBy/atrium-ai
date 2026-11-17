@@ -73,6 +73,22 @@ final class GenerateTest extends TestCase
             ->assertJsonPath('value', 'A cosy hotel by the lake.');
     }
 
+    public function test_the_job_after_the_response_is_given_the_time_it_needs(): void
+    {
+        config(['atrium-ai.queue.connection' => '', 'queue.default' => 'database', 'atrium-ai.timeout' => 400]);
+        Writer::fake(['A cosy hotel by the lake.']);
+        set_time_limit(0);
+
+        $this->actingAs($this->admin(), 'admin')->postJson('/admin/ai/generate', [
+            'module' => 'articles',
+            'field' => 'detail_text',
+            'values' => ['name' => 'Lake Hotel'],
+        ])->assertStatus(202);
+
+        // The job's own time is the longer of 300 seconds and one provider timeout.
+        $this->assertSame('400', ini_get('max_execution_time'));
+    }
+
     public function test_the_usage_is_logged_without_the_texts(): void
     {
         Writer::fake(['Short preview.']);

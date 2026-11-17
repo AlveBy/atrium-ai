@@ -16,7 +16,10 @@ use Atrium\Ai\Agents\Writer;
 use Atrium\Ai\Briefs;
 use Atrium\Ai\Images;
 use Atrium\Ai\Jobs\Generate;
+use Atrium\Ai\Task;
 use Atrium\Ai\Tests\Fixtures\Article;
+use Atrium\Ai\Tests\Fixtures\Loose;
+use Atrium\Ai\Tests\Fixtures\SeoArticle;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\TestResponse;
@@ -76,6 +79,27 @@ final class BriefsTest extends TestCase
         $this->expectExceptionMessage(__('atrium-ai::ai.errors.no_ai'));
 
         app(Briefs::class)->make(AdminUser::class, 'name', ['name' => 'Ann']);
+    }
+
+    public function test_a_model_that_is_not_administrable_has_no_ai_fields(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage(__('atrium-ai::ai.errors.no_ai'));
+
+        app(Briefs::class)->make(Loose::class, 'name', ['name' => 'Ann']);
+    }
+
+    public function test_the_fields_a_model_with_tabs_adds_are_written_too(): void
+    {
+        $brief = app(Briefs::class)->make(SeoArticle::class, 'meta_description', ['detail_text' => '<p>A hotel by the lake.</p>']);
+
+        $this->assertSame(Task::SeoDescription, $brief->task);
+        $this->assertSame(['Description' => 'A hotel by the lake.'], $brief->sources);
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage(__('atrium-ai::ai.errors.no_ai'));
+
+        app(Briefs::class)->make(Article::class, 'meta_description', ['detail_text' => '<p>A hotel by the lake.</p>']);
     }
 
     public function test_a_picture_of_this_site_given_by_its_full_address_is_read(): void

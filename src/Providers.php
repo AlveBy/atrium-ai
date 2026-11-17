@@ -39,7 +39,7 @@ final class Providers
 
     public function available(string $kind): bool
     {
-        return (bool) config('atrium-ai.enabled', true) && $this->chain($kind) !== [];
+        return config('atrium-ai.enabled', true) && $this->chain($kind) !== [];
     }
 
     /**
@@ -72,7 +72,7 @@ final class Providers
         foreach ($items as $key => $item) {
             // ['gemini' => 'gemini-3-flash'] as well as ['gemini:gemini-3-flash'].
             $item = is_string($key) ? $key.':'.$item : (string) $item;
-            [$provider, $model] = array_pad(explode(':', trim($item), 2), 2, null);
+            [$provider, $model] = [...explode(':', trim($item), 2), null];
 
             if ($provider !== '') {
                 $entries[] = [$provider, $model === null || $model === '' ? null : $model];

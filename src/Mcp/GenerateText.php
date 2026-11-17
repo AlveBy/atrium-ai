@@ -41,13 +41,13 @@ class GenerateText extends ApiTool
             return $this->unknownModule($request);
         }
 
-        return $api->call('POST', 'ai/generate', $this->siteQuery($request), array_filter([
+        return $api->call('POST', 'ai/generate', $this->siteQuery($request), [
             'module' => $module,
-            'field' => (string) $request->get('field', ''),
+            'field' => $request->get('field', ''),
             'id' => $request->get('id'),
             'values' => $request->get('values'),
             'locale' => $request->get('locale'),
             'translate' => $request->get('translate'),
-        ], static fn ($value): bool => $value !== null));
+        ]);
     }
 }

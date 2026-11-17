@@ -24,10 +24,6 @@ final class Images
     {
         $value = trim($value);
 
-        if ($value === '') {
-            return null;
-        }
-
         if (preg_match('#^(https?:)?//#i', $value) === 1) {
             $host = parse_url($value, PHP_URL_HOST);
             $own = [parse_url((string) config('app.url'), PHP_URL_HOST), request()->getHost()];

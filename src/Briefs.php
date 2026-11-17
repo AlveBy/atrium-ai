@@ -50,7 +50,7 @@ final class Briefs
 
         $language = $locale !== null && $this->languages->has($locale) ? $locale : $this->languages->default();
         $task = $translate ? Task::Translate : (Task::tryFrom($ai['task']) ?? Task::Describe);
-        $format = $field instanceof ContentField || $field instanceof WysiwygField ? 'html' : 'text';
+        $format = $field instanceof ContentField ? 'html' : 'text';
         $max = $this->maxLength($field);
         $common = ['field' => $field->getLabel() ?: $name, 'format' => $format, 'max' => $max, 'module' => $module, 'user' => $user];
 
@@ -166,7 +166,7 @@ final class Briefs
 
         if (! $keepHtml) {
             $text = html_entity_decode(strip_tags(str_replace(['<br>', '<br/>', '<br />', '</p>', '</li>'], "\n", $text)), ENT_QUOTES | ENT_HTML5);
-            $text = trim((string) preg_replace(['/[ \t]+/u', '/\n\s*\n+/u'], [' ', "\n\n"], $text));
+            $text = (string) preg_replace(['/[ \t]+/u', '/\n\s*\n+/u'], [' ', "\n\n"], $text);
         }
 
         return mb_substr(trim($text), 0, max(100, (int) config('atrium-ai.max_source_length', 6000)));
@@ -174,10 +174,6 @@ final class Briefs
 
     private function maxLength(Field $field): ?int
     {
-        if (! $field instanceof TextField && ! $field instanceof TextareaField) {
-            return null;
-        }
-
         $max = $field->toArray()['maxLength'] ?? null;
 
         return is_int($max) && $max > 0 ? $max : null;

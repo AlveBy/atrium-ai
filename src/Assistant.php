@@ -14,6 +14,7 @@ use Atrium\Admin\Support\Sites;
 use Atrium\Ai\Agents\Writer;
 use Atrium\Ai\Exceptions\NotConfigured;
 use Atrium\Ai\Models\Usage;
+use Carbon\CarbonInterface;
 use Laravel\Ai\Embeddings;
 use Laravel\Ai\Files\Image;
 use Laravel\Ai\Responses\AgentResponse;
@@ -80,7 +81,7 @@ final class Assistant
             throw NotConfigured::for($brief->task->kind());
         }
 
-        $started = hrtime(true);
+        $started = now();
 
         try {
             $response = (new Writer($this->system($language)))->prompt(
@@ -105,6 +106,9 @@ final class Assistant
      */
     private function prompt(Brief $brief, array $extra = []): string
     {
+        // The shorter of what the task asks for and what the field allows.
+        $limits = array_filter([$brief->task->limit(), $brief->max], static fn (?int $limit): bool => $limit !== null);
+
         return trim(view($this->view($brief->task->value), [
             'task' => $brief->task,
             'field' => $brief->field,
@@ -112,9 +116,7 @@ final class Assistant
             'text' => implode("\n\n", $brief->sources),
             'language' => $this->languageName($brief->language),
             'html' => $brief->format === 'html',
-            'limit' => $brief->task->limit() !== null && $brief->max !== null
-                ? min($brief->task->limit(), $brief->max)
-                : ($brief->task->limit() ?? $brief->max),
+            'limit' => $limits === [] ? null : min($limits),
             ...$extra,
         ])->render());
     }
@@ -137,7 +139,7 @@ final class Assistant
         return LanguageNames::describe($code, $this->languages->find($code)?->name);
     }
 
-    private function log(Brief $brief, int|float $started, ?AgentResponse $response): void
+    private function log(Brief $brief, CarbonInterface $started, ?AgentResponse $response): void
     {
         if (! config('atrium-ai.log', true)) {
             return;
@@ -150,9 +152,9 @@ final class Assistant
                 'admin_user_id' => $brief->user,
                 'provider' => $response?->meta->provider,
                 'model' => $response?->meta->model,
-                'input_tokens' => $response?->usage->inputTokens ?? 0,
-                'output_tokens' => $response?->usage->outputTokens ?? 0,
-                'duration_ms' => (int) round((hrtime(true) - $started) / 1_000_000),
+                'input_tokens' => $response->usage->inputTokens ?? 0,
+                'output_tokens' => $response->usage->outputTokens ?? 0,
+                'duration_ms' => round($started->diffInMilliseconds(now())),
                 'succeeded' => $response !== null,
             ]);
         } catch (Throwable $e) {

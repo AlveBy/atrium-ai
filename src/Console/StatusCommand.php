@@ -56,11 +56,11 @@ final class StatusCommand extends Command
             ['Provider', 'Calls', 'Failed', 'Input tokens', 'Output tokens', 'Avg ms'],
             $usage->map(fn ($row): array => [
                 $row->provider ?? '(none answered)',
-                (int) $row->calls,
-                (int) $row->failed,
-                (int) $row->input_tokens,
-                (int) $row->output_tokens,
-                (int) round((float) $row->duration),
+                $row->calls,
+                $row->failed,
+                $row->input_tokens,
+                $row->output_tokens,
+                round((float) $row->duration),
             ])->all(),
         );
 

@@ -61,7 +61,7 @@ final class Images
         foreach ([public_path(), Storage::disk('public')->path('')] as $root) {
             $root = realpath($root);
 
-            if ($root !== false && str_starts_with($real, rtrim($root, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR)) {
+            if ($root !== false && str_starts_with($real, $root.DIRECTORY_SEPARATOR)) {
                 return $real;
             }
         }

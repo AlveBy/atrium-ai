@@ -52,7 +52,7 @@ final class LanguageNames
     public static function describe(string $code, ?string $name = null): string
     {
         $key = str_replace('_', '-', strtolower($code));
-        [$base, $suffix] = array_pad(explode('-', $key, 2), 2, null);
+        [$base, $suffix] = [...explode('-', $key, 2), null];
         $english = self::NAMES[$key] ?? null;
 
         if ($english === null && isset(self::NAMES[$base], self::SCRIPTS[$suffix])) {

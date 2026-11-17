@@ -26,9 +26,14 @@ final class Images
 
         if (preg_match('#^(https?:)?//#i', $value) === 1) {
             $host = parse_url($value, PHP_URL_HOST);
-            $own = [parse_url((string) config('app.url'), PHP_URL_HOST), request()->getHost()];
+            $own = [request()->getHost()];
+            $appHost = parse_url((string) config('app.url'), PHP_URL_HOST);
 
-            if (! is_string($host) || ! in_array(strtolower($host), array_map('strtolower', array_filter($own)), true)) {
+            if (is_string($appHost)) {
+                $own[] = $appHost;
+            }
+
+            if (! is_string($host) || ! in_array(strtolower($host), array_map('strtolower', $own), true)) {
                 return null;
             }
 
@@ -44,7 +49,7 @@ final class Images
         // "/storage/uploads/x.jpg", "/upload/iblock/x.jpg" — from the web root;
         // "uploads/x.jpg" — on the public disk.
         $candidate = str_starts_with($path, '/')
-            ? public_path(ltrim($path, '/'))
+            ? public_path($path)
             : Storage::disk('public')->path($path);
 
         return $this->safe($candidate);

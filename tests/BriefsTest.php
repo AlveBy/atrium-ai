@@ -174,6 +174,31 @@ final class BriefsTest extends TestCase
         $this->assertNull(app(Images::class)->local($value));
     }
 
+    public function test_a_link_to_a_folder_that_only_starts_like_the_web_root_is_not_read(): void
+    {
+        $neighbour = public_path().'-neighbour';
+        $outside = $this->picture($neighbour.'/outside.png');
+        @mkdir(public_path('storage/ai-brief'), 0777, true);
+        symlink($neighbour, public_path('storage/ai-brief/folder'));
+
+        try {
+            $this->assertNull(app(Images::class)->local('/storage/ai-brief/folder/outside.png'));
+        } finally {
+            @unlink(public_path('storage/ai-brief/folder'));
+            @unlink($outside);
+            @rmdir($neighbour);
+        }
+    }
+
+    public function test_an_address_of_this_site_is_read_when_the_app_url_has_no_host(): void
+    {
+        $file = $this->picture(public_path('storage/ai-brief/lake.png'));
+        config(['app.url' => '']);
+
+        $this->assertSame(realpath($file), app(Images::class)->local('http://localhost/storage/ai-brief/lake.png'));
+        $this->assertNull(app(Images::class)->local('https://cdn.example.org/storage/ai-brief/lake.png'));
+    }
+
     public function test_a_link_in_the_web_root_to_a_picture_elsewhere_is_not_read(): void
     {
         $outside = $this->picture(sys_get_temp_dir().'/atrium-ai-'.getmypid().'/outside.png');

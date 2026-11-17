@@ -123,6 +123,13 @@ final class BriefsTest extends TestCase
         $this->assertNull(app(Images::class)->local('https://example.com/storage/ai-brief/lake.png'));
     }
 
+    public function test_the_extension_of_a_picture_may_be_in_capitals(): void
+    {
+        $file = $this->picture(public_path('storage/ai-brief/LAKE.PNG'));
+
+        $this->assertSame(realpath($file), app(Images::class)->local('/storage/ai-brief/LAKE.PNG'));
+    }
+
     public function test_a_picture_on_the_public_disk_is_read_by_its_path(): void
     {
         Storage::fake('public');
@@ -143,6 +150,7 @@ final class BriefsTest extends TestCase
             'up out of the web root' => ['/storage/../../.env'],
             'not a picture' => ['/storage/ai-brief/notes.txt'],
             'a folder' => ['/storage/ai-brief'],
+            'this site without a path' => ['http://localhost'],
         ];
     }
 

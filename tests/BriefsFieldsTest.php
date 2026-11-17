@@ -67,7 +67,7 @@ final class BriefsFieldsTest extends TestCase
 
     public function test_named_sources_skip_the_field_itself_and_the_ones_the_form_does_not_have(): void
     {
-        $brief = $this->brief('notes', ['name' => 'Lake', 'notes' => 'Mine', 'detail_text' => 'Long']);
+        $brief = $this->brief('notes', ['name' => 'Lake', 'notes' => 'Mine', 'detail_text' => 'Long', 'summary' => 'Not named']);
 
         $this->assertSame(['Name' => 'Lake', 'Detail' => 'Long'], $brief->sources);
     }
@@ -97,6 +97,18 @@ final class BriefsFieldsTest extends TestCase
     public function test_a_value_is_read_as_plain_text(mixed $value, string $expected): void
     {
         $this->assertSame(['Summary' => $expected], $this->brief('free', ['summary' => $value])->sources);
+    }
+
+    public function test_a_value_that_is_not_valid_utf8_is_nothing(): void
+    {
+        $this->assertSame(['Name' => 'Lake'], $this->brief('free', ['name' => 'Lake', 'summary' => "bad \xB1 text"])->sources);
+    }
+
+    public function test_a_long_text_is_cut_by_letters_not_by_bytes(): void
+    {
+        config(['atrium-ai.max_source_length' => 100]);
+
+        $this->assertSame(['Name' => str_repeat('ж', 100)], $this->brief('free', ['name' => str_repeat('ж', 150)])->sources);
     }
 
     public function test_a_value_that_is_neither_text_nor_a_number_is_nothing(): void

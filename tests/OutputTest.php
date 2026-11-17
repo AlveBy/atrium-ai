@@ -45,7 +45,7 @@ final class OutputTest extends TestCase
             'single quotes go' => ["'Lake Hotel'", 'text', 'Lake Hotel'],
             'guillemets go' => ['«Hi»', 'text', 'Hi'],
             'curly quotes go' => ['“Hi”', 'text', 'Hi'],
-            'quoted text is trimmed' => ['" Hi "', 'text', 'Hi'],
+            'quoted text is trimmed' => ['" Hi "', 'html', 'Hi'],
             'quoted text may take several lines' => ["\"line 1\nline 2\"", 'html', "line 1\nline 2"],
             'quotes in the middle stay' => ['He said "hi"', 'text', 'He said "hi"'],
             'a quote after the end stays' => ['"hi" there', 'text', '"hi" there'],

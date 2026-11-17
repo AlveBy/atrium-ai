@@ -48,6 +48,8 @@ final class ApiGenerateTest extends TestCase
         return [
             'no module' => [['module' => null] + $ok, 'module'],
             'no field' => [['field' => null] + $ok, 'field'],
+            'a module left out' => [array_diff_key($ok, ['module' => 1]), 'module'],
+            'a field left out' => [array_diff_key($ok, ['field' => 1]), 'field'],
             'a module that is not a text' => [['module' => ['articles']] + $ok, 'module'],
             'an id that is not a number' => [['id' => 'last'] + $ok, 'id'],
             'values that are not a list' => [['values' => 'Lake'] + $ok, 'values'],
@@ -76,10 +78,16 @@ final class ApiGenerateTest extends TestCase
 
     public function test_what_is_left_out_may_be_null(): void
     {
-        Writer::fake(['Text']);
+        Writer::fake(['Text', 'Text']);
+        $article = Article::query()->create(['name' => ['en' => 'Lake']]);
 
         $this->withToken($this->token())
             ->postJson('/api/v1/ai/generate', ['module' => 'articles', 'field' => 'detail_text', 'id' => null, 'values' => ['name' => 'Lake'], 'locale' => null, 'translate' => null])
+            ->assertOk()
+            ->assertJsonPath('data.value', 'Text');
+
+        $this->withToken($this->token())
+            ->postJson('/api/v1/ai/generate', ['module' => 'articles', 'field' => 'detail_text', 'id' => $article->id, 'values' => null])
             ->assertOk()
             ->assertJsonPath('data.value', 'Text');
     }
@@ -165,6 +173,20 @@ final class ApiGenerateTest extends TestCase
             ->postJson('/api/v1/ai/generate', ['module' => 'articles', 'field' => 'preview_text', 'locale' => 'en', 'translate' => true, 'values' => ['preview_text' => ['en' => 'Hello']]])
             ->assertOk()
             ->assertJsonPath('data.values.de', 'Hallo');
+    }
+
+    public function test_the_generate_text_tool_passes_the_language_on(): void
+    {
+        Language::query()->create(['code' => 'de', 'name' => 'Deutsch', 'sort' => 200]);
+        app(ContentLanguages::class)->flush();
+        Writer::fake(['Text']);
+
+        $result = $this->mcp($this->token(), 'tools/call', ['name' => 'generate_text', 'arguments' => [
+            'module' => 'articles', 'field' => 'detail_text', 'locale' => 'de', 'values' => ['name' => ['en' => 'Lake', 'de' => 'See']],
+        ]])->json('result');
+
+        $this->assertFalse($result['isError'], (string) ($result['content'][0]['text'] ?? ''));
+        Writer::assertPrompted(fn (AgentPrompt $prompt): bool => str_contains($prompt->prompt, 'Name: See'));
     }
 
     public function test_the_generate_text_tool_takes_every_argument_of_its_schema(): void

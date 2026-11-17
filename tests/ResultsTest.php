@@ -69,7 +69,7 @@ final class ResultsTest extends TestCase
 
         Carbon::setTestNow('2026-01-01 00:09:59');
         $this->assertNotNull($results->find($long, 1));
-        Carbon::setTestNow('2026-01-01 00:10:01');
+        Carbon::setTestNow('2026-01-01 00:10:00');
         $this->assertNull($results->find($long, 1));
     }
 

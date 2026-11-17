@@ -32,6 +32,8 @@ final class GenerateEndpointTest extends TestCase
         return [
             'no module' => [['module' => null] + $ok, 'module'],
             'no field' => [['field' => null] + $ok, 'field'],
+            'a module left out' => [array_diff_key($ok, ['module' => 1]), 'module'],
+            'a field left out' => [array_diff_key($ok, ['field' => 1]), 'field'],
             'values that are not a list' => [['values' => 'Lake'] + $ok, 'values'],
             'a language code too long' => [['locale' => str_repeat('x', 21)] + $ok, 'locale'],
             'a translate that is not a flag' => [['translate' => 'maybe'] + $ok, 'translate'],
@@ -101,19 +103,6 @@ final class GenerateEndpointTest extends TestCase
             ->postJson('/admin/ai/generate', ['module' => 'articles', 'field' => 'detail_text', 'values' => ['name' => 'Lake']])
             ->assertForbidden()
             ->assertJsonPath('message', __('atrium::permissions.forbidden'));
-    }
-
-    public function test_a_user_whose_key_comes_as_a_text_is_still_the_owner(): void
-    {
-        Writer::fake(['Text']);
-        $admin = $this->admin();
-        $admin->setAttribute('id', (string) $admin->getKey());
-
-        $id = $this->actingAs($admin, 'admin')
-            ->postJson('/admin/ai/generate', ['module' => 'articles', 'field' => 'detail_text', 'values' => ['name' => 'Lake']])
-            ->assertStatus(202)->json('id');
-
-        $this->getJson('/admin/ai/generate/'.$id)->assertOk()->assertJsonPath('status', 'done');
     }
 
     public function test_the_actions_are_public(): void

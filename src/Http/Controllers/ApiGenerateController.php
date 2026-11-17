@@ -62,7 +62,7 @@ final class ApiGenerateController extends Controller
     }
 
     /**
-     * The saved values of a record, translatable ones with every language.
+     * The saved values of a record; a translatable one is already every language.
      *
      * @param  class-string<Model>  $model
      * @return array<string,mixed>
@@ -73,15 +73,6 @@ final class ApiGenerateController extends Controller
             return [];
         }
 
-        $record = $model::query()->findOrFail($id);
-        $values = $record->attributesToArray();
-
-        if (method_exists($record, 'getTranslatableAttributes') && method_exists($record, 'getTranslations')) {
-            foreach ($record->getTranslatableAttributes() as $attribute) {
-                $values[$attribute] = $record->getTranslations($attribute);
-            }
-        }
-
-        return $values;
+        return $model::query()->findOrFail($id)->attributesToArray();
     }
 }

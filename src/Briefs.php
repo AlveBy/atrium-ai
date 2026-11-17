@@ -12,7 +12,6 @@ namespace Atrium\Ai;
 use Atrium\Admin\Contracts\Administrable;
 use Atrium\Admin\Fields\ContentField;
 use Atrium\Admin\Fields\Field;
-use Atrium\Admin\Fields\SlugField;
 use Atrium\Admin\Fields\TextareaField;
 use Atrium\Admin\Fields\TextField;
 use Atrium\Admin\Fields\WysiwygField;
@@ -136,10 +135,6 @@ final class Briefs
 
     private function isText(Field $field): bool
     {
-        if ($field instanceof SlugField) {
-            return false;
-        }
-
         if ($field instanceof TextField) {
             return ! in_array($field->toArray()['inputType'] ?? 'text', ['password', 'email', 'tel', 'url'], true);
         }

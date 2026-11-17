@@ -48,7 +48,7 @@ final class GenerateController extends Controller
         abort_if($model === null, 404);
         abort_unless(self::mayWrite($user, $data['module']), 403, __('atrium::permissions.forbidden'));
 
-        $owner = $user instanceof AdminUser ? (int) $user->getKey() : null;
+        $owner = $user instanceof AdminUser ? $user->getKey() : null;
         $brief = $this->briefs->make(
             $model,
             $data['field'],
@@ -68,7 +68,7 @@ final class GenerateController extends Controller
     public function show(Request $request, string $id): JsonResponse
     {
         $user = $request->user(config('atrium.auth.guard', 'admin'));
-        $entry = $this->results->find($id, $user instanceof AdminUser ? (int) $user->getKey() : null);
+        $entry = $this->results->find($id, $user instanceof AdminUser ? $user->getKey() : null);
 
         abort_if($entry === null, 404);
 

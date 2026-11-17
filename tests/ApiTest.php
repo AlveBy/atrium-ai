@@ -13,10 +13,12 @@ use Atrium\Admin\Models\AdminRole;
 use Atrium\Admin\Models\AdminUser;
 use Atrium\Ai\Agents\Writer;
 use Atrium\Ai\Tests\Fixtures\Article;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Testing\TestResponse;
 use Laravel\Ai\Prompts\AgentPrompt;
 use Laravel\Sanctum\Sanctum;
 use ReflectionClass;
+use RuntimeException;
 
 /**
  * The same generation for external programs: the API and the MCP server,
@@ -77,6 +79,46 @@ final class ApiTest extends TestCase
 
         $this->assertFalse($result['isError'], (string) ($result['content'][0]['text'] ?? ''));
         $this->assertSame('A cosy hotel by the lake.', json_decode($result['content'][0]['text'], true)['data']['value']);
+    }
+
+    public function test_a_provider_that_fails_answers_503_with_a_plain_message(): void
+    {
+        Exceptions::fake();
+        Writer::fake(fn () => throw new RuntimeException('Connection timed out after 60 seconds'));
+
+        $this->withToken($this->token(['articles.view', 'articles.update'], ['articles:read', 'articles:write']))
+            ->postJson('/api/v1/ai/generate', ['module' => 'articles', 'field' => 'detail_text', 'values' => ['name' => 'Lake Hotel']])
+            ->assertStatus(503)
+            ->assertExactJson(['message' => __('atrium-ai::ai.errors.failed')]);
+
+        // What the provider said stays in the log: it may quote the request.
+        Exceptions::assertReported(RuntimeException::class);
+    }
+
+    public function test_a_provider_without_a_key_answers_503_and_says_so(): void
+    {
+        Writer::fake()->preventStrayPrompts();
+        config(['ai.providers.gemini.key' => null, 'ai.providers.groq.key' => null]);
+
+        $this->withToken($this->token(['articles.view', 'articles.update'], ['articles:read', 'articles:write']))
+            ->postJson('/api/v1/ai/generate', ['module' => 'articles', 'field' => 'detail_text', 'values' => ['name' => 'Lake Hotel']])
+            ->assertStatus(503)
+            ->assertExactJson(['message' => __('atrium-ai::ai.errors.not_configured')]);
+    }
+
+    public function test_the_generate_text_tool_names_a_module_it_does_not_know(): void
+    {
+        Writer::fake()->preventStrayPrompts();
+        $token = $this->token(['articles.view', 'articles.update'], ['articles:read', 'articles:write']);
+
+        $result = $this->mcp($token, 'tools/call', ['name' => 'generate_text', 'arguments' => [
+            'module' => 'recipes',
+            'field' => 'detail_text',
+        ]])->json('result');
+
+        $this->assertTrue($result['isError']);
+        $this->assertSame('No module "recipes". See list_modules.', $result['content'][0]['text']);
+        Writer::assertNeverPrompted();
     }
 
     /**

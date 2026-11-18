@@ -21,6 +21,18 @@ return [
         'by' => 'Geschrieben von :provider',
         'error' => 'Die KI hat nicht geantwortet. Versuchen Sie es später erneut.',
     ],
+    'help' => [
+        'open' => 'Den Assistenten fragen',
+        'title' => 'Assistent',
+        'hello' => 'Hallo! Ich kenne die Atrium-Anleitungen und kann in Ihre Bereiche schauen. Was möchten Sie wissen?',
+        'placeholder' => 'Fragen Sie zum Admin-Bereich oder zu Ihren Inhalten…',
+        'send' => 'Senden',
+        'thinking' => 'Ich denke nach…',
+        'note' => 'Ich lese nur und ändere nichts. Antworten können falsch sein.',
+        'clear' => 'Neues Gespräch',
+        'close' => 'Schließen',
+        'error' => 'Ich konnte nicht antworten. Versuchen Sie es später erneut.',
+    ],
     'errors' => [
         'no_ai' => 'Für dieses Feld gibt es keine KI-Generierung.',
         'no_image' => 'Laden Sie zuerst das Bild hoch.',

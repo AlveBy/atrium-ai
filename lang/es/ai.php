@@ -21,6 +21,18 @@ return [
         'by' => 'Escrito por :provider',
         'error' => 'La IA no respondió. Inténtelo más tarde.',
     ],
+    'help' => [
+        'open' => 'Preguntar al asistente',
+        'title' => 'Asistente',
+        'hello' => '¡Hola! Conozco las guías de Atrium y puedo consultar tus secciones. ¿Qué quieres saber?',
+        'placeholder' => 'Pregunta sobre el panel o tus contenidos…',
+        'send' => 'Enviar',
+        'thinking' => 'Pensando…',
+        'note' => 'Solo leo y no cambio nada. Las respuestas pueden ser incorrectas.',
+        'clear' => 'Nueva conversación',
+        'close' => 'Cerrar',
+        'error' => 'No pude responder. Inténtalo más tarde.',
+    ],
     'errors' => [
         'no_ai' => 'Este campo no tiene generación con IA.',
         'no_image' => 'Primero suba la imagen.',

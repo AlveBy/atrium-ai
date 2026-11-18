@@ -21,6 +21,18 @@ return [
         'by' => ':provider yazdı',
         'error' => 'Yapay zekâ yanıt vermedi. Daha sonra tekrar deneyin.',
     ],
+    'help' => [
+        'open' => 'Asistana sor',
+        'title' => 'Asistan',
+        'hello' => 'Merhaba! Atrium kılavuzlarını biliyorum ve bölümlerinize bakabilirim. Ne öğrenmek istersiniz?',
+        'placeholder' => 'Panel veya içerikleriniz hakkında sorun…',
+        'send' => 'Gönder',
+        'thinking' => 'Düşünüyorum…',
+        'note' => 'Yalnızca okurum, hiçbir şeyi değiştirmem. Yanıtlar hatalı olabilir.',
+        'clear' => 'Yeni sohbet',
+        'close' => 'Kapat',
+        'error' => 'Yanıt veremedim. Daha sonra tekrar deneyin.',
+    ],
     'errors' => [
         'no_ai' => 'Bu alanda yapay zekâ ile oluşturma yok.',
         'no_image' => 'Önce görseli yükleyin.',

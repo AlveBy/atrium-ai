@@ -21,6 +21,18 @@ return [
         'by' => 'Napisał :provider',
         'error' => 'AI nie odpowiedziała. Spróbuj później.',
     ],
+    'help' => [
+        'open' => 'Zapytaj asystenta',
+        'title' => 'Asystent',
+        'hello' => 'Cześć! Znam przewodniki Atrium i mogę zajrzeć do Twoich sekcji. Co chcesz wiedzieć?',
+        'placeholder' => 'Zapytaj o panel lub swoje treści…',
+        'send' => 'Wyślij',
+        'thinking' => 'Myślę…',
+        'note' => 'Tylko czytam i niczego nie zmieniam. Odpowiedzi mogą być błędne.',
+        'clear' => 'Nowa rozmowa',
+        'close' => 'Zamknij',
+        'error' => 'Nie udało się odpowiedzieć. Spróbuj później.',
+    ],
     'errors' => [
         'no_ai' => 'To pole nie ma generowania przez AI.',
         'no_image' => 'Najpierw prześlij obraz.',

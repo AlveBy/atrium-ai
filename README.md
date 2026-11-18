@@ -122,6 +122,32 @@ php artisan vendor:publish --tag=atrium-ai-prompts
 
 They land in `resources/views/vendor/atrium-ai/prompts`. Or point a task at a view of your own in `config/atrium-ai.php` → `prompts`. A view gets `$field` (the field's label), `$sources` (label → text), `$text` (all of them as one text), `$language` ("English (en)", "Uzbek in Latin script (Oʻzbekcha, uz)"), `$html`, `$limit` and, for `translate`, `$target`. `system` is the instruction every task starts with.
 
+## The helper
+
+The Atrium arch in the bottom right corner of every admin page opens a chat. The administrator asks in their own language ("how do I add a menu item?", "how many products are out of stock?") and the helper answers from the guides and from the records, with links into the admin. It only reads; it changes nothing.
+
+It has tools, and the model decides which to call:
+
+| Tool | What it does |
+|---|---|
+| `list_modules` | The modules this administrator may open, with their admin addresses |
+| `describe_module` | A module's fields, filters and sorts, as the API documents them |
+| `list_records` | Records of a module: search, filters, sort, up to 10 at a time |
+| `get_record` | One record by its id |
+| `search_docs` | Sections of the guides (`docs/`) and the module READMEs that match the words; a guide translated into the administrator's language is read instead of the English one |
+
+The record tools read through the API's own controller with the permissions of the administrator who asked: a module they may not view does not exist for the helper. No token is created.
+
+The answer is written after the response, like a generation, and the chat asks for it every second and a half. The conversation stays in the browser tab (the last 20 messages); the last 10 go with each question.
+
+> **Privacy.** The question, the guide sections and the records the helper reads go to the provider of the `text` chain. With Gemini's free tier that means Google may read them. On a site with private data use Ollama or a paid key, or turn the helper off.
+
+```dotenv
+ATRIUM_AI_HELP=false  # no arch, no chat
+```
+
+In `config/atrium-ai.php`, `help.docs` lists the Markdown to search (a folder means every `.md` in it; globs work), and `help.tools` adds tools of your own: classes implementing `Laravel\Ai\Contracts\Tool`, made by the container, which passes `$user` (the `AdminUser`) and `$locale` to a constructor that asks for them. The prompt is the `help` view.
+
 ## API and MCP
 
 The same generation is open to programs, with the API's tokens and rules (the `{module}:write` ability, and the owner's right to edit the module):

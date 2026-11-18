@@ -11,8 +11,8 @@ namespace Atrium\Ai\Http\Controllers;
 
 use Atrium\Admin\Models\AdminUser;
 use Atrium\Admin\Resources\ResourceRegistry;
-use Atrium\Ai\Brief;
 use Atrium\Ai\Briefs;
+use Atrium\Ai\Jobs\Background;
 use Atrium\Ai\Jobs\Generate;
 use Atrium\Ai\Results;
 use Illuminate\Http\JsonResponse;
@@ -60,7 +60,7 @@ final class GenerateController extends Controller
         );
 
         $id = $this->results->start($owner);
-        $this->dispatch($id, $brief);
+        Background::run(new Generate($id, $brief));
 
         return response()->json(['id' => $id, ...($this->results->find($id, $owner) ?? ['status' => 'pending'])], 202);
     }
@@ -83,35 +83,5 @@ final class GenerateController extends Controller
     {
         return $user instanceof AdminUser
             && ($user->hasAdminPermission("{$module}.update") || $user->hasAdminPermission("{$module}.create"));
-    }
-
-    /**
-     * Without a queue connection of its own (the default) the job runs in
-     * this PHP process once the answer has gone to the browser: no worker
-     * needed, and the form still does not wait. With one, a worker runs it.
-     */
-    private function dispatch(string $id, Brief $brief): void
-    {
-        $job = new Generate($id, $brief);
-        $connection = config('atrium-ai.queue.connection');
-
-        if ($connection === null || $connection === '') {
-            app()->terminating(static function () use ($job): void {
-                // A host may forbid it: the warning is silenced.
-                @set_time_limit($job->timeout);
-
-                app()->call([$job, 'handle']);
-            });
-
-            return;
-        }
-
-        $job->onConnection((string) $connection);
-
-        if (($queue = config('atrium-ai.queue.queue')) !== null && $queue !== '') {
-            $job->onQueue((string) $queue);
-        }
-
-        dispatch($job);
     }
 }

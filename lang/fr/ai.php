@@ -21,6 +21,18 @@ return [
         'by' => 'Rédigé par :provider',
         'error' => 'L’IA n’a pas répondu. Réessayez plus tard.',
     ],
+    'help' => [
+        'open' => 'Demander à l’assistant',
+        'title' => 'Assistant',
+        'hello' => 'Bonjour ! Je connais les guides d’Atrium et je peux consulter vos rubriques. Que voulez-vous savoir ?',
+        'placeholder' => 'Posez une question sur l’administration ou vos contenus…',
+        'send' => 'Envoyer',
+        'thinking' => 'Je réfléchis…',
+        'note' => 'Je ne fais que lire, je ne modifie rien. Les réponses peuvent être erronées.',
+        'clear' => 'Nouvelle conversation',
+        'close' => 'Fermer',
+        'error' => 'Je n’ai pas pu répondre. Réessayez plus tard.',
+    ],
     'errors' => [
         'no_ai' => 'Ce champ n’a pas de génération par IA.',
         'no_image' => 'Téléversez d’abord l’image.',

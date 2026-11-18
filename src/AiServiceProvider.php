@@ -82,6 +82,10 @@ final class AiServiceProvider extends ServiceProvider
 
         return [
             'url' => route('admin.ai.generate', [], false),
+            'help' => config('atrium-ai.help.enabled', true) ? [
+                'url' => route('admin.ai.help', [], false),
+                'labels' => trans('atrium-ai::ai.help'),
+            ] : null,
             'tasks' => $tasks,
             'labels' => trans('atrium-ai::ai.ui'),
         ];

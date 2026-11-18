@@ -21,6 +21,18 @@ return [
         'by' => 'Yozgan: :provider',
         'error' => 'SI javob bermadi. Keyinroq urinib ko‘ring.',
     ],
+    'help' => [
+        'open' => 'Yordamchidan so‘rash',
+        'title' => 'Yordamchi',
+        'hello' => 'Salom! Men Atrium hujjatlarini bilaman va bo‘limlaringizni ko‘rib chiqa olaman. Nima haqida aytib beray?',
+        'placeholder' => 'Boshqaruv paneli yoki yozuvlaringiz haqida so‘rang…',
+        'send' => 'Yuborish',
+        'thinking' => 'O‘ylayapman…',
+        'note' => 'Men faqat o‘qiyman, hech narsani o‘zgartirmayman. Javoblar xato bo‘lishi mumkin.',
+        'clear' => 'Yangi suhbat',
+        'close' => 'Yopish',
+        'error' => 'Javob bera olmadim. Keyinroq urinib ko‘ring.',
+    ],
     'errors' => [
         'no_ai' => 'Bu maydonda SI bilan yaratish yo‘q.',
         'no_image' => 'Avval rasmni yuklang.',

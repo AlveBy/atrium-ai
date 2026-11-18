@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 use Atrium\Ai\Http\Controllers\ApiGenerateController;
 use Atrium\Ai\Http\Controllers\GenerateController;
+use Atrium\Ai\Http\Controllers\HelpController;
 use Illuminate\Support\Facades\Route;
 
 // The admin form's "Generate" button: start, then poll.
@@ -16,6 +17,7 @@ Route::prefix(config('atrium.prefix', 'admin'))
     ->middleware([...config('atrium.middleware', ['web']), 'atrium.site', 'atrium.inertia', 'admin.auth', 'throttle:30,1'])
     ->group(function (): void {
         Route::post('ai/generate', [GenerateController::class, 'store'])->name('admin.ai.generate');
+        Route::post('ai/help', HelpController::class)->name('admin.ai.help');
         Route::get('ai/generate/{id}', [GenerateController::class, 'show'])
             ->whereUuid('id')
             ->withoutMiddleware('throttle:30,1')

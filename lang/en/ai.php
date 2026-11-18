@@ -21,6 +21,18 @@ return [
         'by' => 'Written by :provider',
         'error' => 'The AI did not answer. Try again later.',
     ],
+    'help' => [
+        'open' => 'Ask the helper',
+        'title' => 'Helper',
+        'hello' => 'Hi! I know the Atrium guides and can look through your sections. What would you like to know?',
+        'placeholder' => 'Ask about the panel or your content…',
+        'send' => 'Send',
+        'thinking' => 'Thinking…',
+        'note' => 'I only read and change nothing. Answers can be wrong.',
+        'clear' => 'New conversation',
+        'close' => 'Close',
+        'error' => 'I could not answer. Try again later.',
+    ],
     'errors' => [
         'no_ai' => 'This field has no AI generation.',
         'no_image' => 'Upload the image first.',

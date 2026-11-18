@@ -26,10 +26,18 @@ return new class extends Migration
             $table->string('meta_title')->nullable();
             $table->timestamps();
         });
+
+        Schema::create('ai_stores', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('site_id')->nullable()->index();
+            $table->string('name');
+            $table->timestamps();
+        });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('ai_stores');
         Schema::dropIfExists('ai_articles');
     }
 };

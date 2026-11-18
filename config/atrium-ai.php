@@ -75,6 +75,25 @@ return [
         'seo_keywords' => 'atrium-ai::prompts.seo-keywords',
         'alt' => 'atrium-ai::prompts.alt',
         'translate' => 'atrium-ai::prompts.translate',
+        'help' => 'atrium-ai::prompts.help',
+    ],
+
+    /*
+    | The helper in the corner of the admin: answers from the guides and reads
+    | the records of the modules the admin may view (never writes). What it
+    | reads goes to the provider, like any prompt.
+    | "docs": folders of *.md guides and globs of module READMEs.
+    | "tools": classes of your own Laravel AI SDK tools, made with the
+    | admin ($user) and the interface language ($locale).
+    */
+    'help' => [
+        'enabled' => (bool) env('ATRIUM_AI_HELP', true),
+        'docs' => [
+            base_path('docs'),
+            base_path('vendor/alveby/*/README.md'),
+            base_path('packages/*/README.md'),
+        ],
+        'tools' => [],
     ],
 
     // How much of each source field goes into a prompt, in characters.

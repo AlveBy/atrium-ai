@@ -94,9 +94,9 @@ final class HelpAnswerTest extends HelpTestCase
     public static function languages(): array
     {
         return [
-            'with its own name' => ['uz', 'Answer in Uzbek in Latin script (Oʻzbekcha, uz)'],
-            'with a country' => ['pt_BR', 'Answer in Brazilian Portuguese (Português (Brasil), pt_BR)'],
-            'not among the panel languages' => ['fi', 'Answer in fi,'],
+            'with its own name' => ['uz', 'answer in Uzbek in Latin script (Oʻzbekcha, uz).'],
+            'with a country' => ['pt_BR', 'answer in Brazilian Portuguese (Português (Brasil), pt_BR).'],
+            'not among the panel languages' => ['fi', 'answer in fi.'],
         ];
     }
 
@@ -109,6 +109,29 @@ final class HelpAnswerTest extends HelpTestCase
 
         $this->assertSame($locale, $result['value']);
         Helper::assertPrompted(fn (AgentPrompt $prompt): bool => str_contains($prompt->agent->instructions(), $expected));
+    }
+
+    /**
+     * @return array<string,array{0:string,1:string,2:string}>
+     */
+    public static function questions(): array
+    {
+        return [
+            'a Russian question in an English panel' => ['Как у нас по скорости с сайтом?', 'en', 'English (en)'],
+            'an English question in a Russian panel' => ['How fast is our site?', 'ru', 'Russian (Русский, ru)'],
+        ];
+    }
+
+    #[DataProvider('questions')]
+    public function test_the_answer_follows_the_language_of_the_question_and_the_panels_is_the_fallback(string $question, string $locale, string $fallback): void
+    {
+        Helper::fake(['An answer.']);
+
+        $this->answer(question: $question, locale: $locale);
+
+        Helper::assertPrompted(fn (AgentPrompt $prompt): bool => $prompt->prompt === $question
+            && str_contains($prompt->agent->instructions(), "Answer in the language of the admin's latest question, whatever language the guides, the records or the panel are in.")
+            && str_contains($prompt->agent->instructions(), "Only when that language cannot be told (a single word, a number, a name), answer in {$fallback}."));
     }
 
     public function test_the_language_of_the_process_is_given_back_after_the_answer(): void

@@ -137,6 +137,8 @@ It has tools, and the model decides which to call:
 | `get_record` | One record by its id |
 | `search_docs` | Sections of the guides (`docs/`) and the module READMEs that match the words; a guide translated into the administrator's language is read instead of the English one |
 
+The answer is in the language of the question, whatever the language of the panel; the panel's language is used only when the question's cannot be told (a single word, a number). Other modules add tools of their own: with `alveby/atrium-monitoring` installed there is `site_speed`, the numbers of its screen (the response time, the share of failed requests, the slowest pages) for an administrator who may open it.
+
 The record tools read through the API's own controller with the permissions of the administrator who asked: a module they may not view does not exist for the helper. No token is created.
 
 The answer is written after the response, like a generation, and the chat asks for it every second and a half. The conversation stays in the browser tab (the last 20 messages); the last 10 go with each question.

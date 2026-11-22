@@ -15,11 +15,14 @@ use Atrium\Admin\Modules\Modules;
 use Atrium\Admin\Support\ConfigList;
 use Atrium\Ai\Agents\Helper;
 use Atrium\Ai\Console\StatusCommand;
+use Atrium\Ai\GigaChat\GigaChatProvider;
 use Atrium\Ai\Help\Tools\SearchDocs;
 use Atrium\Ai\Mcp\GenerateText;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
+use Laravel\Ai\AiManager;
 use Laravel\Ai\Events\InvokingTool;
 
 /**
@@ -54,6 +57,8 @@ final class AiServiceProvider extends ServiceProvider
             ], 'atrium-ai-prompts');
         }
 
+        $this->addProviders();
+
         // Required but not installed: no table for the log, so no buttons.
         if (! $this->app->make(Modules::class)->isInstalled(self::MODULE)) {
             return;
@@ -72,6 +77,24 @@ final class AiServiceProvider extends ServiceProvider
                 $this->app->make(Results::class)->step($event->agent->answer, $event->tool instanceof SearchDocs ? 'read' : 'search');
             }
         });
+    }
+
+    /**
+     * The providers of atrium-ai.providers join the SDK's, unless the app has
+     * one of the name; "gigachat" is a driver the SDK lacks.
+     */
+    private function addProviders(): void
+    {
+        foreach ((array) config('atrium-ai.providers') as $name => $provider) {
+            if (! is_array(config("ai.providers.{$name}"))) {
+                config(["ai.providers.{$name}" => $provider]);
+            }
+        }
+
+        $this->callAfterResolving(AiManager::class, static fn (AiManager $ai) => $ai->extend(
+            'gigachat',
+            fn ($app, array $config): GigaChatProvider => new GigaChatProvider($config, $app->make(Dispatcher::class)),
+        ));
     }
 
     /**

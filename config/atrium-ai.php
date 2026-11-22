@@ -39,9 +39,44 @@ return [
     | to improve its products: for private data use Ollama or a paid key.
     */
     'chains' => [
-        'text' => env('ATRIUM_AI_TEXT', 'gemini,groq,openrouter:meta-llama/llama-3.3-70b-instruct:free'),
-        'vision' => env('ATRIUM_AI_VISION', 'gemini,openrouter:google/gemma-3-27b-it:free'),
+        'text' => env('ATRIUM_AI_TEXT', 'gemini,groq,openrouter:google/gemma-4-31b-it:free,openrouter:google/gemma-4-26b-a4b-it:free'),
+        'vision' => env('ATRIUM_AI_VISION', 'gemini,openrouter:nvidia/nemotron-3.5-super-vl:free,openrouter:google/gemma-4-31b-it:free'),
         'embeddings' => env('ATRIUM_AI_EMBEDDINGS', 'gemini'),
+    ],
+
+    /*
+    | Providers the SDK's config/ai.php does not know, for Russia and Belarus,
+    | where Gemini and Groq refuse the region. Added to "ai.providers" unless
+    | the app's own config already has one of that name. A key in .env is all
+    | it takes; the chain then names them: ATRIUM_AI_TEXT=yandex,gigachat,deepseek
+    | (DeepSeek is the SDK's own: DEEPSEEK_API_KEY).
+    |
+    | yandex: YandexGPT through Yandex Cloud's OpenAI-compatible API. Needs a
+    | service account's API key and the folder's id; or name the model in the
+    | chain: yandex:gpt://<folder_id>/yandexgpt/latest
+    |
+    | gigachat: Sber's GigaChat. "key" is the authorization key of the
+    | console; the scope is GIGACHAT_API_PERS (a person), GIGACHAT_API_B2B or
+    | GIGACHAT_API_CORP. Its certificate chain is the Russian Ministry of
+    | Digital Development's: save it and give its path in GIGACHAT_CA_BUNDLE.
+    | Text only: no embeddings and no images.
+    */
+    'providers' => [
+        'yandex' => [
+            'driver' => 'openai-compatible',
+            'url' => env('YANDEX_URL', 'https://llm.api.cloud.yandex.net/v1'),
+            'key' => env('YANDEX_API_KEY'),
+            'models' => ['text' => ['default' => env('YANDEX_FOLDER_ID') ? 'gpt://'.env('YANDEX_FOLDER_ID').'/yandexgpt/latest' : null]],
+        ],
+        'gigachat' => [
+            'driver' => 'gigachat',
+            'key' => env('GIGACHAT_AUTH_KEY'),
+            'scope' => env('GIGACHAT_SCOPE', 'GIGACHAT_API_PERS'),
+            'url' => env('GIGACHAT_URL', 'https://gigachat.devices.sberbank.ru/api/v1'),
+            'auth_url' => env('GIGACHAT_AUTH_URL', 'https://ngw.devices.sberbank.ru:9443/api/v2/oauth'),
+            'ca_bundle' => env('GIGACHAT_CA_BUNDLE'),
+            'models' => ['text' => ['default' => env('GIGACHAT_MODEL', 'GigaChat')]],
+        ],
     ],
 
     // A provider that refuses the region (a 403, or "location is not

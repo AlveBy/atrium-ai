@@ -10,7 +10,7 @@ AI writing help for the [Atrium](https://github.com/AlveBy/atrium) admin, on top
 
 The text comes up in a dialog. The editor reads it, edits it and either puts it into the field or cancels. The AI never saves anything: the record changes only when the editor presses **Save**.
 
-Any provider the SDK supports works. The defaults are free tiers: Google Gemini, Groq, OpenRouter's free models, or Ollama on your own server. A paid provider is a line in `.env`.
+Any provider the SDK supports works. The defaults are free tiers: Google Gemini, Groq, OpenRouter's free models, or Ollama on your own server or in its cloud. From Russia and Belarus, where Gemini and Groq refuse, see [Russia and Belarus](#russia-and-belarus): YandexGPT, GigaChat, DeepSeek. A paid provider is a line in `.env`.
 
 > **Privacy.** Gemini's free tier lets Google use your prompts and answers to improve its products, and people may read them. The prompt holds the record's text. For anything private use Ollama (nothing leaves your server) or a paid key, whose terms do not allow that.
 
@@ -71,8 +71,8 @@ The answer is in the language being edited, whatever the language of the source.
 
 ```php
 'chains' => [
-    'text' => env('ATRIUM_AI_TEXT', 'gemini,groq,openrouter:meta-llama/llama-3.3-70b-instruct:free'),
-    'vision' => env('ATRIUM_AI_VISION', 'gemini,openrouter:google/gemma-3-27b-it:free'),
+    'text' => env('ATRIUM_AI_TEXT', 'gemini,groq,openrouter:google/gemma-4-31b-it:free,openrouter:google/gemma-4-26b-a4b-it:free'),
+    'vision' => env('ATRIUM_AI_VISION', 'gemini,openrouter:nvidia/nemotron-3.5-super-vl:free,openrouter:google/gemma-4-31b-it:free'),
     'embeddings' => env('ATRIUM_AI_EMBEDDINGS', 'gemini'),
 ],
 ```
@@ -87,6 +87,8 @@ ATRIUM_AI_VISION=ollama:gemma3:4b
 OLLAMA_URL=http://127.0.0.1:11434
 ```
 
+Ollama Cloud runs the same models without your own server: `OLLAMA_URL=https://ollama.com` and a key from [ollama.com/settings/keys](https://ollama.com/settings/keys) as `OLLAMA_API_KEY` (sent as `Authorization: Bearer`), and a cloud model in the chain, `ATRIUM_AI_TEXT=ollama:gpt-oss:120b`.
+
 A paid provider is the same: `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` in `.env`, and `ATRIUM_AI_TEXT=openai,gemini`. Every provider and its key name is in the SDK's `config/ai.php`.
 
 | Setting | Default | What it does |
@@ -97,6 +99,38 @@ A paid provider is the same: `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` in `.env`, 
 | `refused_for` (config only) | `3600` | Seconds a provider that refused the region is left out |
 | `ATRIUM_AI_QUEUE_CONNECTION`, `ATRIUM_AI_QUEUE` | none | A queue for the generation job; none = right after the response, no worker |
 | `ATRIUM_AI_LOG` | `true` | The usage log |
+
+## Russia and Belarus
+
+Gemini and Groq refuse these countries (a 403, or "User location is not supported"); Atrium skips a provider that does that and asks the next one. What works from there:
+
+| Provider | Key in `.env` | Where the key comes from | Notes |
+|---|---|---|---|
+| YandexGPT | `YANDEX_API_KEY`, `YANDEX_FOLDER_ID` | An API key of a service account with the role `ai.languageModels.user`, and the folder's id, in [Yandex Cloud](https://console.yandex.cloud) | Text. `yandex` is the SDK's `openai-compatible` driver on `https://llm.api.cloud.yandex.net/v1`; the model is `gpt://<folder_id>/yandexgpt/latest` |
+| GigaChat | `GIGACHAT_AUTH_KEY`, `GIGACHAT_SCOPE`, `GIGACHAT_CA_BUNDLE` | The authorization key of a project in [GigaChat API](https://developers.sber.ru/studio) | Text. Atrium trades the key for an access token (30 minutes, kept in the cache) |
+| DeepSeek | `DEEPSEEK_API_KEY` | [platform.deepseek.com](https://platform.deepseek.com) | Text and the helper. The SDK's own driver, tried with the buttons and the helper; the servers are in China |
+| Ollama Cloud | `OLLAMA_URL=https://ollama.com`, `OLLAMA_API_KEY` | [ollama.com/settings/keys](https://ollama.com/settings/keys) | Text and pictures, with the models ollama.com marks as cloud, such as `gpt-oss:120b` |
+| Ollama on your own server | `OLLAMA_URL=http://127.0.0.1:11434` | none | Nothing leaves your server |
+
+```dotenv
+YANDEX_API_KEY=...
+YANDEX_FOLDER_ID=b1g...
+GIGACHAT_AUTH_KEY=...
+GIGACHAT_CA_BUNDLE=/etc/ssl/russian-ca.pem
+DEEPSEEK_API_KEY=...
+
+ATRIUM_AI_TEXT=yandex,gigachat,deepseek
+```
+
+**YandexGPT.** With `YANDEX_FOLDER_ID` the model is `gpt://<folder_id>/yandexgpt/latest`. Another model, or the folder in the chain itself: `ATRIUM_AI_TEXT=yandex:gpt://b1g.../yandexgpt-lite/latest`. Only the first colon of an entry splits the provider from the model, so the colons and slashes of the model's address are safe.
+
+**GigaChat.** `GIGACHAT_SCOPE` is `GIGACHAT_API_PERS` (a person, the default), `GIGACHAT_API_B2B` or `GIGACHAT_API_CORP`; `GIGACHAT_MODEL` is `GigaChat` unless you name `GigaChat-Pro` or `GigaChat-Max` (or put it in the chain: `gigachat:GigaChat-Pro`). Its servers use the certificates of the Russian Ministry of Digital Development, which the system store does not know. Download them from [gosuslugi.ru/crt](https://www.gosuslugi.ru/crt), join the root and the intermediate into one PEM file (`openssl x509 -inform der -in cert.cer -out cert.pem` turns a `.cer` into PEM) and give its path in `GIGACHAT_CA_BUNDLE`. The certificate is always checked: Atrium has no setting that turns the check off. Text only: no pictures and no embeddings.
+
+**Pictures and embeddings** need a model that sees pictures. Of the above only Ollama (`ATRIUM_AI_VISION=ollama:gemma3:4b`, on your server or in the cloud) and OpenRouter's free models do. Without one the `alt` button is not shown.
+
+**Your texts.** A prompt holds the record's text and goes to the provider of the chain: to Yandex, Sber or DeepSeek's servers. For private data use Ollama on your own server.
+
+**The helper** reads records and guides by asking the model to call tools. With YandexGPT and GigaChat that depends on the model; if the helper answers without looking, put DeepSeek or another provider first in the `text` chain.
 
 ## The form does not wait
 

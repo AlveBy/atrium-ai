@@ -195,6 +195,45 @@ final class DemoLimitTest extends TestCase
             ->assertStatus(429);
     }
 
+    public function test_the_answer_at_the_last_second_still_says_to_wait_a_second(): void
+    {
+        $this->demo();
+        $this->travelTo(now()->endOfDay());
+        config(['atrium-ai.demo.daily_limit' => 1]);
+        Writer::fake(['Text']);
+
+        $this->panel()->assertStatus(202);
+
+        $this->assertSame('1', $this->panel()->assertStatus(429)->headers->get('Retry-After'));
+    }
+
+    public function test_the_counter_of_a_day_is_forgotten_an_hour_after_the_day_ends(): void
+    {
+        $this->demo();
+        $this->travelTo(now()->startOfDay()->setTime(12, 0));
+        Writer::fake(['Text']);
+        $this->panel()->assertStatus(202);
+        $key = 'atrium-ai:demo-calls:'.now()->toDateString();
+
+        $this->assertSame(1, Cache::store('array')->get($key));
+
+        $this->travelTo(now()->endOfDay()->addHour()->subSeconds(2));
+        $this->assertSame(1, Cache::store('array')->get($key));
+
+        $this->travelTo(now()->addSeconds(4));
+        $this->assertNull(Cache::store('array')->get($key));
+    }
+
+    public function test_the_limit_from_the_environment_is_a_string_and_counts_as_a_number(): void
+    {
+        $this->demo();
+        config(['atrium-ai.demo.daily_limit' => '1']);
+        Writer::fake(['Text']);
+
+        $this->panel()->assertStatus(202);
+        $this->panel()->assertStatus(429);
+    }
+
     public function test_tomorrow_the_allowance_is_new(): void
     {
         $this->demo();

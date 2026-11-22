@@ -48,7 +48,7 @@ final class DemoLimit
         if ($store->increment($key, $calls) > $limit) {
             $store->decrement($key, $calls);
 
-            abort(429, __('atrium-ai::ai.errors.demo_limit'), ['Retry-After' => (string) max(1, (int) now()->diffInSeconds(now()->endOfDay()))]);
+            abort(429, __('atrium-ai::ai.errors.demo_limit'), ['Retry-After' => max(1, (int) now()->diffInSeconds(now()->endOfDay()))]);
         }
     }
 

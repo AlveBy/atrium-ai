@@ -87,6 +87,7 @@ final class AiServiceProvider extends ServiceProvider
                 'labels' => trans('atrium-ai::ai.help'),
             ] : null,
             'tasks' => $tasks,
+            'demo' => $this->app->make(DemoLimit::class)->active(),
             'labels' => trans('atrium-ai::ai.ui'),
         ];
     }

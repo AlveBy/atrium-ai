@@ -12,6 +12,7 @@ namespace Atrium\Ai\Http\Controllers;
 use Atrium\Admin\Api\ApiResources;
 use Atrium\Ai\Assistant;
 use Atrium\Ai\Briefs;
+use Atrium\Ai\DemoLimit;
 use Atrium\Ai\Failures;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -30,6 +31,7 @@ final class ApiGenerateController extends Controller
         private readonly ApiResources $resources,
         private readonly Briefs $briefs,
         private readonly Assistant $assistant,
+        private readonly DemoLimit $limit,
     ) {}
 
     public function __invoke(Request $request): JsonResponse
@@ -53,6 +55,8 @@ final class ApiGenerateController extends Controller
 
         $values = [...$this->stored($model, $data['id'] ?? null), ...($data['values'] ?? [])];
         $brief = $this->briefs->make($model, $data['field'], $values, $data['locale'] ?? null, (bool) ($data['translate'] ?? false), $module, (int) $owner->getKey());
+
+        $this->limit->claim($brief->calls());
 
         try {
             return response()->json(['data' => $this->assistant->generate($brief)->toArray()]);

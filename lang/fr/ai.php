@@ -20,6 +20,7 @@ return [
         'check' => 'Relisez avant d’enregistrer : l’IA se trompe. Rien n’est enregistré avant que vous cliquiez sur Enregistrer.',
         'by' => 'Rédigé par :provider',
         'error' => 'L’IA n’a pas répondu. Réessayez plus tard.',
+        'demo_notice' => 'Cette démo est publique : ne saisissez ni données personnelles, ni données d\'autrui, ni rien de privé.',
     ],
     'help' => [
         'open' => 'Demander à l’assistant',
@@ -41,5 +42,6 @@ return [
         'not_configured' => 'L’IA n’est pas configurée : aucun fournisseur n’a de clé.',
         'busy' => 'Tous les fournisseurs d’IA sont occupés ou ont dépassé leur quota gratuit. Réessayez dans une minute.',
         'failed' => 'Le fournisseur d’IA n’a pas répondu. Réessayez plus tard.',
+        'demo_limit' => 'La limite quotidienne d\'IA de la démo est atteinte. Réessayez demain.',
     ],
 ];

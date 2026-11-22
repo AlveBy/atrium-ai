@@ -77,7 +77,7 @@ The answer is in the language being edited, whatever the language of the source.
 ],
 ```
 
-`provider` or `provider:model`. Without a model the SDK's default for that provider is used. A provider without a key is skipped. When a provider answers with a rate limit, an overload or a timeout, the next one is asked. The `alt` button needs a provider in `vision`.
+`provider` or `provider:model`. Without a model the SDK's default for that provider is used. A provider without a key is skipped. A provider may be listed more than once with different models (`openrouter:model-a:free,openrouter:model-b:free`): they are tried one after the other. When an entry answers with a rate limit, an overload or a timeout, the next entry is asked. So it is when a provider refuses the region it is reached from (a 403, or Gemini's 400 "User location is not supported"): the next entry is asked, and that provider is left out of every chain for an hour (`refused_for` in `config/atrium-ai.php`), so that each request does not wait for the refusal again. Every other error, a wrong key or a model that does not exist, is shown to the editor. The `alt` button needs a provider in `vision`.
 
 Ollama needs no key. List it and set its address:
 
@@ -94,6 +94,7 @@ A paid provider is the same: `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` in `.env`, 
 | `ATRIUM_AI_ENABLED` | `true` | The buttons, without removing the keys |
 | `ATRIUM_AI_TEXT`, `ATRIUM_AI_VISION`, `ATRIUM_AI_EMBEDDINGS` | see above | The chains |
 | `ATRIUM_AI_TIMEOUT` | `60` | Seconds one provider may take before the next one is asked |
+| `refused_for` (config only) | `3600` | Seconds a provider that refused the region is left out |
 | `ATRIUM_AI_QUEUE_CONNECTION`, `ATRIUM_AI_QUEUE` | none | A queue for the generation job; none = right after the response, no worker |
 | `ATRIUM_AI_LOG` | `true` | The usage log |
 
@@ -161,6 +162,16 @@ curl -X POST https://example.com/api/v1/ai/generate \
 With `id` the saved record is used; `values` overrides fields; `locale` and `translate` work as in the admin. The answer is `{"data": {"value": "…", "provider": "gemini", "model": "…"}}`, or `{"data": {"values": {"de": "…"}}}` for a translation. Nothing is saved.
 
 An AI assistant connected to `/mcp` gets the same as the `generate_text` tool.
+
+## Public demo
+
+On a public demo (`ATRIUM_DEMO=true`, see [docs/demo.md](../../docs/demo.md)) every visitor is the same administrator, so the per-minute throttle is shared by all of them and cannot stop one visitor from spending the provider's whole free quota for the day. While the demo mode is on, the module therefore:
+
+- **Caps the day.** The site as a whole gets `ATRIUM_AI_DEMO_DAILY_LIMIT` provider calls a day (40 by default, below the 50 requests a day that an OpenRouter key with no credit gets for all its free models; `0` for no cap), counted from midnight in the app's time zone. A text, a helper question and the **Generate** of every field each take one call; a translation takes one per language. The panel's button, the helper, `POST /api/v1/ai/generate` and the `generate_text` tool of MCP share the one allowance. A call that fails at the provider still counts, since the provider counted it too; a request refused for its fields does not.
+- **Refuses, without asking a provider,** once the allowance is gone: the dialog and the chat say "The demo's daily AI limit is used up. Try again tomorrow." (in the admin's language), and the API and MCP answer `429` with the same message and a `Retry-After` header holding the seconds until midnight. A translation that would not fit into what is left is refused whole and takes nothing.
+- **Says the demo is public.** The dialog under **Generate** and the helper's chat carry a line that personal data must not be typed in.
+
+The count is kept in a cache store of its own, `ATRIUM_AI_DEMO_STORE` (`file` by default), and not in the `ai_usage` table: the demo's reset empties the database every hour, the usage log and a `database` cache included, and the visitors would get a fresh allowance each hour. Use any store that survives the reset (`file`, `redis`, `memcached`). Outside demo mode nothing is counted and nothing is limited.
 
 ## Usage log
 

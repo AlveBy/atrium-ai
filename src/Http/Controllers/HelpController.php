@@ -11,6 +11,7 @@ namespace Atrium\Ai\Http\Controllers;
 
 use Atrium\Admin\Models\AdminUser;
 use Atrium\Admin\Support\Sites;
+use Atrium\Ai\DemoLimit;
 use Atrium\Ai\Jobs\Answer;
 use Atrium\Ai\Jobs\Background;
 use Atrium\Ai\Providers;
@@ -25,7 +26,7 @@ use Illuminate\Routing\Controller;
  */
 final class HelpController extends Controller
 {
-    public function __invoke(Request $request, Results $results, Providers $providers): JsonResponse
+    public function __invoke(Request $request, Results $results, Providers $providers, DemoLimit $limit): JsonResponse
     {
         $data = $request->validate([
             'question' => ['required', 'string', 'max:2000'],
@@ -38,6 +39,8 @@ final class HelpController extends Controller
 
         abort_unless($user instanceof AdminUser, 403);
         abort_unless($providers->available('text') && config('atrium-ai.help.enabled', true), 404);
+
+        $limit->claim();
 
         $owner = $user->getKey();
         $id = $results->start($owner);

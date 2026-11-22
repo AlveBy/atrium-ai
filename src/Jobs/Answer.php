@@ -73,11 +73,12 @@ final class Answer implements ShouldQueue
             // Records of the other sites stay hidden, as in the admin.
             $sites->setCurrent(Site::query()->findOrFail($this->site));
             $user = AdminUser::query()->findOrFail($this->user);
-            $response = (new Helper($this->instructions($user), $this->tools($user), $this->messages()))->prompt(
+            $helper = new Helper($this->instructions($user), $this->tools($user), $this->messages());
+            $response = $providers->ask('text', fn (array $chain): AgentResponse => $helper->prompt(
                 $this->question,
-                provider: $providers->chain('text'),
+                provider: $chain,
                 timeout: (int) config('atrium-ai.timeout', 60),
-            );
+            ));
 
             $results->done($this->id, new Result(value: trim(mb_substr($response->text, 0, 6000)), provider: $response->meta->provider, model: $response->meta->model));
         } catch (Throwable $e) {

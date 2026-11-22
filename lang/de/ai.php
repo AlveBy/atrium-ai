@@ -20,6 +20,7 @@ return [
         'check' => 'Vor dem Speichern lesen: KI macht Fehler. Nichts wird gespeichert, bevor Sie auf Speichern klicken.',
         'by' => 'Geschrieben von :provider',
         'error' => 'Die KI hat nicht geantwortet. Versuchen Sie es später erneut.',
+        'demo_notice' => 'Diese Demo ist öffentlich: Geben Sie keine personenbezogenen oder fremden Daten und nichts Privates ein.',
     ],
     'help' => [
         'open' => 'Den Assistenten fragen',
@@ -41,5 +42,6 @@ return [
         'not_configured' => 'KI ist nicht eingerichtet: Kein Anbieter hat einen Schlüssel.',
         'busy' => 'Alle KI-Anbieter sind ausgelastet oder über ihrem kostenlosen Limit. Versuchen Sie es in einer Minute erneut.',
         'failed' => 'Der KI-Anbieter hat nicht geantwortet. Versuchen Sie es später erneut.',
+        'demo_limit' => 'Das tägliche KI-Limit der Demo ist aufgebraucht. Versuchen Sie es morgen wieder.',
     ],
 ];

@@ -20,6 +20,7 @@ return [
         'check' => 'Léalo antes de guardar: la IA se equivoca. No se guarda nada hasta que pulse Guardar.',
         'by' => 'Escrito por :provider',
         'error' => 'La IA no respondió. Inténtelo más tarde.',
+        'demo_notice' => 'Esta demo es pública: no escriba datos personales, datos de otras personas ni nada privado.',
     ],
     'help' => [
         'open' => 'Preguntar al asistente',
@@ -41,5 +42,6 @@ return [
         'not_configured' => 'La IA no está configurada: ningún proveedor tiene clave.',
         'busy' => 'Todos los proveedores de IA están ocupados o superaron su límite gratuito. Inténtelo en un minuto.',
         'failed' => 'El proveedor de IA no respondió. Inténtelo más tarde.',
+        'demo_limit' => 'Se agotó el límite diario de IA de la demo. Inténtelo de nuevo mañana.',
     ],
 ];

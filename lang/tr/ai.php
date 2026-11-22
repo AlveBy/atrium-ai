@@ -20,6 +20,7 @@ return [
         'check' => 'Kaydetmeden önce okuyun: yapay zekâ hata yapar. Kaydet’e basana kadar hiçbir şey kaydedilmez.',
         'by' => ':provider yazdı',
         'error' => 'Yapay zekâ yanıt vermedi. Daha sonra tekrar deneyin.',
+        'demo_notice' => 'Bu demo herkese açıktır: kişisel verileri, başkalarına ait verileri veya özel hiçbir şeyi yazmayın.',
     ],
     'help' => [
         'open' => 'Asistana sor',
@@ -41,5 +42,6 @@ return [
         'not_configured' => 'Yapay zekâ ayarlanmamış: hiçbir sağlayıcının anahtarı yok.',
         'busy' => 'Tüm yapay zekâ sağlayıcıları meşgul veya ücretsiz sınırını aştı. Bir dakika sonra tekrar deneyin.',
         'failed' => 'Yapay zekâ sağlayıcısı yanıt vermedi. Daha sonra tekrar deneyin.',
+        'demo_limit' => 'Demonun günlük yapay zekâ sınırı doldu. Yarın tekrar deneyin.',
     ],
 ];

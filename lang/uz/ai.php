@@ -20,6 +20,7 @@ return [
         'check' => 'Saqlashdan oldin o‘qing: SI xato qiladi. «Saqlash»ni bosmaguningizcha hech narsa saqlanmaydi.',
         'by' => 'Yozgan: :provider',
         'error' => 'SI javob bermadi. Keyinroq urinib ko‘ring.',
+        'demo_notice' => 'Bu ommaviy demo: shaxsiy maʼlumotlarni, boshqalarning maʼlumotlarini va hech qanday maxfiy narsani kiritmang.',
     ],
     'help' => [
         'open' => 'Yordamchidan so‘rash',
@@ -41,5 +42,6 @@ return [
         'not_configured' => 'SI sozlanmagan: hech bir provayderda kalit yo‘q.',
         'busy' => 'Barcha SI provayderlari band yoki bepul limiti tugagan. Bir daqiqadan so‘ng urinib ko‘ring.',
         'failed' => 'SI provayderi javob bermadi. Keyinroq urinib ko‘ring.',
+        'demo_limit' => 'Demodagi sun’iy intellektning kunlik limiti tugadi. Ertaga qayta urinib ko‘ring.',
     ],
 ];

@@ -36,4 +36,10 @@ final readonly class Brief
         public ?string $module = null,
         public ?int $user = null,
     ) {}
+
+    /** How many times the provider is asked: once, or once per language of a translation. */
+    public function calls(): int
+    {
+        return $this->task === Task::Translate ? count($this->targets) : 1;
+    }
 }

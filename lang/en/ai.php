@@ -20,6 +20,7 @@ return [
         'check' => 'Read it before saving: AI makes mistakes. Nothing is saved until you press Save.',
         'by' => 'Written by :provider',
         'error' => 'The AI did not answer. Try again later.',
+        'demo_notice' => 'This demo is public: do not type personal data, other people\'s data or anything private.',
     ],
     'help' => [
         'open' => 'Ask the helper',
@@ -41,5 +42,6 @@ return [
         'not_configured' => 'AI is not set up: no provider has a key.',
         'busy' => 'All AI providers are busy or over their free limit. Try again in a minute.',
         'failed' => 'The AI provider did not answer. Try again later.',
+        'demo_limit' => 'The demo\'s daily AI limit is used up. Try again tomorrow.',
     ],
 ];

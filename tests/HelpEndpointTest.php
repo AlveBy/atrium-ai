@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Atrium\Ai\Tests;
 
 use Atrium\Ai\Agents\Helper;
+use Atrium\Ai\DemoLimit;
 use Atrium\Ai\Http\Controllers\HelpController;
 use Atrium\Ai\Jobs\Answer;
 use Atrium\Ai\Providers;
@@ -86,7 +87,7 @@ final class HelpEndpointTest extends HelpTestCase
         $request->setUserResolver(static fn (): GenericUser => new GenericUser(['id' => 1]));
 
         try {
-            app(HelpController::class)($request, app(Results::class), app(Providers::class));
+            app(HelpController::class)($request, app(Results::class), app(Providers::class), app(DemoLimit::class));
             $this->fail('A user who is not an administrator was let in.');
         } catch (HttpException $e) {
             $this->assertSame(403, $e->getStatusCode());

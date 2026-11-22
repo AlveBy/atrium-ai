@@ -20,6 +20,7 @@ return [
         'check' => 'Przeczytaj przed zapisaniem: AI się myli. Nic nie zostanie zapisane, dopóki nie klikniesz Zapisz.',
         'by' => 'Napisał :provider',
         'error' => 'AI nie odpowiedziała. Spróbuj później.',
+        'demo_notice' => 'To demo jest publiczne: nie wpisuj danych osobowych, cudzych danych ani niczego prywatnego.',
     ],
     'help' => [
         'open' => 'Zapytaj asystenta',
@@ -41,5 +42,6 @@ return [
         'not_configured' => 'AI nie jest skonfigurowana: żaden dostawca nie ma klucza.',
         'busy' => 'Wszyscy dostawcy AI są zajęci lub przekroczyli darmowy limit. Spróbuj za minutę.',
         'failed' => 'Dostawca AI nie odpowiedział. Spróbuj później.',
+        'demo_limit' => 'Dzienny limit AI w demo został wyczerpany. Spróbuj jutro.',
     ],
 ];

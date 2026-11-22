@@ -38,7 +38,7 @@ final class StatusCommandTest extends TestCase
     {
         config(['atrium-ai.chains.text' => 'nosuch,gemini']);
 
-        $this->assertSame(['gemini' => null], app(Providers::class)->chain('text'));
+        $this->assertSame([['gemini', null]], app(Providers::class)->chain('text'));
         $this->assertSame([['provider' => 'nosuch', 'model' => null, 'usable' => false], ['provider' => 'gemini', 'model' => null, 'usable' => true]], app(Providers::class)->describe('text'));
     }
 

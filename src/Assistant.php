@@ -60,13 +60,7 @@ final class Assistant
      */
     public function embed(array $texts): array
     {
-        $chain = $this->providers->chain('embeddings');
-
-        if ($chain === []) {
-            throw NotConfigured::for('embeddings');
-        }
-
-        return Embeddings::for($texts)->generate(provider: $chain)->embeddings;
+        return $this->providers->ask('embeddings', static fn (array $chain): array => Embeddings::for($texts)->generate(provider: $chain)->embeddings);
     }
 
     /**
@@ -75,23 +69,20 @@ final class Assistant
      */
     private function ask(Brief $brief, string $prompt, string $language, array $attachments = []): array
     {
-        $chain = $this->providers->chain($brief->task->kind());
-
-        if ($chain === []) {
-            throw NotConfigured::for($brief->task->kind());
-        }
-
         $started = now();
 
         try {
-            $response = (new Writer($this->system($language)))->prompt(
+            $response = $this->providers->ask($brief->task->kind(), fn (array $chain): AgentResponse => (new Writer($this->system($language)))->prompt(
                 $prompt,
                 $attachments,
                 provider: $chain,
                 timeout: (int) config('atrium-ai.timeout', 60),
-            );
+            ));
         } catch (Throwable $e) {
-            $this->log($brief, $started, null);
+            // No provider with a key is nothing that was asked.
+            if (! $e instanceof NotConfigured) {
+                $this->log($brief, $started, null);
+            }
 
             throw $e;
         }

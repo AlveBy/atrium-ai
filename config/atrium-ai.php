@@ -26,7 +26,9 @@ return [
 
     /*
     | Which provider answers, per kind of work, in order: when one answers
-    | with a rate limit, an overload or a timeout, the next one is asked.
+    | with a rate limit, an overload, a timeout or a refusal of the region (a
+    | 403, "location is not supported"), the next one is asked. A provider may
+    | be listed with several models: they are tried one after the other.
     | "provider" or "provider:model"; without a model the SDK's default for
     | that provider is used. A provider without a key in config/ai.php is
     | skipped (Ollama needs none: list it and it is used). No provider left
@@ -41,6 +43,10 @@ return [
         'vision' => env('ATRIUM_AI_VISION', 'gemini,openrouter:google/gemma-3-27b-it:free'),
         'embeddings' => env('ATRIUM_AI_EMBEDDINGS', 'gemini'),
     ],
+
+    // A provider that refuses the region (a 403, or "location is not
+    // supported") is left out of the chains for this many seconds.
+    'refused_for' => 3600,
 
     // Seconds one provider may take before the next one is asked.
     'timeout' => (int) env('ATRIUM_AI_TIMEOUT', 60),
@@ -94,6 +100,25 @@ return [
             base_path('packages/*/README.md'),
         ],
         'tools' => [],
+    ],
+
+    /*
+    | In a public demo (ATRIUM_DEMO=true) all visitors are one administrator,
+    | so the per-minute throttle is shared and no one stops a single visitor
+    | from using the provider's whole free quota. While the demo mode is on,
+    | the site as a whole gets "daily_limit" provider calls a day (a text, a
+    | helper question, or a call per language of a translation), counted from
+    | midnight in the app's time zone; then the dialogs say the day's limit is
+    | used up and the API and MCP answer 429, without asking a provider.
+    | The default is below the 50 requests a day that an OpenRouter key with
+    | no credit gets for all its free models. 0 = no ceiling. Outside demo
+    | mode nothing is counted.
+    | "store": the cache store of the counter. Not "database": the demo's
+    | hourly reset empties it and gives the visitors a new allowance.
+    */
+    'demo' => [
+        'daily_limit' => (int) env('ATRIUM_AI_DEMO_DAILY_LIMIT', 40),
+        'store' => env('ATRIUM_AI_DEMO_STORE', 'file'),
     ],
 
     // How much of each source field goes into a prompt, in characters.

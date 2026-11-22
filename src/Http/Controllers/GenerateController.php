@@ -12,6 +12,7 @@ namespace Atrium\Ai\Http\Controllers;
 use Atrium\Admin\Models\AdminUser;
 use Atrium\Admin\Resources\ResourceRegistry;
 use Atrium\Ai\Briefs;
+use Atrium\Ai\DemoLimit;
 use Atrium\Ai\Jobs\Background;
 use Atrium\Ai\Jobs\Generate;
 use Atrium\Ai\Results;
@@ -30,6 +31,7 @@ final class GenerateController extends Controller
         private readonly ResourceRegistry $registry,
         private readonly Briefs $briefs,
         private readonly Results $results,
+        private readonly DemoLimit $limit,
     ) {}
 
     public function store(Request $request): JsonResponse
@@ -58,6 +60,8 @@ final class GenerateController extends Controller
             $data['module'],
             $owner,
         );
+
+        $this->limit->claim($brief->calls());
 
         $id = $this->results->start($owner);
         Background::run(new Generate($id, $brief));

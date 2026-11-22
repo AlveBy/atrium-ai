@@ -20,6 +20,7 @@ return [
         'check' => 'Rileggi prima di salvare: l’IA sbaglia. Non viene salvato nulla finché non premi Salva.',
         'by' => 'Scritto da :provider',
         'error' => 'L’IA non ha risposto. Riprova più tardi.',
+        'demo_notice' => 'Questa demo è pubblica: non inserire dati personali, dati altrui o qualcosa di privato.',
     ],
     'help' => [
         'open' => 'Chiedi all’assistente',
@@ -41,5 +42,6 @@ return [
         'not_configured' => 'L’IA non è configurata: nessun provider ha una chiave.',
         'busy' => 'Tutti i provider di IA sono occupati o hanno superato il limite gratuito. Riprova tra un minuto.',
         'failed' => 'Il provider di IA non ha risposto. Riprova più tardi.',
+        'demo_limit' => 'Il limite giornaliero di IA della demo è esaurito. Riprova domani.',
     ],
 ];

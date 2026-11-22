@@ -306,9 +306,10 @@ final class GenerateTest extends TestCase
     {
         config(['atrium-ai.chains.text' => 'openrouter:meta-llama/llama-3.3-70b-instruct:free,groq:openai/gpt-oss-20b,gemini,groq']);
 
-        $this->assertSame(['groq' => 'openai/gpt-oss-20b', 'gemini' => null], app(Providers::class)->chain('text'));
+        // The same provider with another model is another entry; the same pair twice is one.
+        $this->assertSame([['groq', 'openai/gpt-oss-20b'], ['gemini', null], ['groq', null]], app(Providers::class)->chain('text'));
 
         config(['atrium-ai.chains.text' => ['ollama' => 'qwen3.5:4b']]);
-        $this->assertSame(['ollama' => 'qwen3.5:4b'], app(Providers::class)->chain('text'));
+        $this->assertSame([['ollama', 'qwen3.5:4b']], app(Providers::class)->chain('text'));
     }
 }

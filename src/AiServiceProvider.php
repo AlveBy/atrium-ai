@@ -12,6 +12,7 @@ namespace Atrium\Ai;
 use Atrium\Admin\Facades\Setting;
 use Atrium\Admin\Models\AdminUser;
 use Atrium\Admin\Modules\Modules;
+use Atrium\Admin\Support\ConfigList;
 use Atrium\Ai\Agents\Helper;
 use Atrium\Ai\Console\StatusCommand;
 use Atrium\Ai\Help\Tools\SearchDocs;
@@ -59,7 +60,7 @@ final class AiServiceProvider extends ServiceProvider
         }
 
         $this->loadRoutesFrom(__DIR__.'/../routes/ai.php');
-        config()->push('atrium.mcp.tools', GenerateText::class);
+        ConfigList::add('atrium.mcp.tools', GenerateText::class);
 
         // Lazy: runs per page, after the admin is signed in.
         Inertia::share('ai', fn () => $this->client());

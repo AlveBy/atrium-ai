@@ -12,6 +12,8 @@ namespace Atrium\Ai\Tests;
 use Atrium\Admin\Models\Language;
 use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Ai\Agents\Writer;
+use Atrium\Ai\AiServiceProvider;
+use Atrium\Ai\Mcp\GenerateText;
 use Atrium\Ai\Tests\Concerns\CallsTheApi;
 use Atrium\Ai\Tests\Fixtures\Article;
 use Atrium\Ai\Tests\Fixtures\Plain;
@@ -209,5 +211,13 @@ final class ApiGenerateTest extends TestCase
         $this->assertFalse($result['isError'], (string) ($result['content'][0]['text'] ?? ''));
         $this->assertSame(['de' => 'Hallo'], json_decode($result['content'][0]['text'], true)['data']['values']);
         Writer::assertPrompted(fn (AgentPrompt $prompt): bool => str_contains($prompt->prompt, 'Hello'));
+    }
+
+    public function test_the_tool_is_offered_once_after_config_cache(): void
+    {
+        // A cached config already holds the tool: booting on top of it must not add it again.
+        $this->app->getProvider(AiServiceProvider::class)->boot();
+
+        $this->assertSame(1, array_count_values((array) config('atrium.mcp.tools'))[GenerateText::class]);
     }
 }

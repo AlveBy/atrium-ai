@@ -8,6 +8,12 @@
 declare(strict_types=1);
 
 return [
+    'settings' => [
+        'module' => 'IA',
+        'description' => 'Cómo se ve el asistente de IA en la esquina del panel.',
+        'playful' => 'Asistente divertido',
+        'playful_hint' => 'Cejas, una sonrisa y pequeños disfraces muestran lo que hace el asistente. Desactivado: el arco tranquilo. En ningún caso aparece ni habla por sí solo.',
+    ],
     'ui' => [
         'generate' => 'Generar',
         'translate' => 'Traducir',
@@ -33,6 +39,14 @@ return [
         'clear' => 'Nueva conversación',
         'close' => 'Cerrar',
         'error' => 'No pude responder. Inténtalo más tarde.',
+        'mood' => [
+            'thinking' => 'El asistente está pensando',
+            'happy' => 'El asistente ha respondido',
+            'sorry' => 'El asistente no pudo responder',
+            'search' => 'El asistente está buscando en los registros',
+            'read' => 'El asistente está leyendo las guías',
+            'write' => 'La IA está escribiendo un texto',
+        ],
     ],
     'errors' => [
         'no_ai' => 'Este campo no tiene generación con IA.',

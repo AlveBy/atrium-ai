@@ -8,6 +8,12 @@
 declare(strict_types=1);
 
 return [
+    'settings' => [
+        'module' => 'AI',
+        'description' => '面板角落里 AI 助手的样子。',
+        'playful' => '活泼的助手',
+        'playful_hint' => '眉毛、微笑和小小的装扮会显示助手正在做什么。关闭时：安静的拱门。无论哪种样子，它都不会自己弹出或开口说话。',
+    ],
     'ui' => [
         'generate' => '生成',
         'translate' => '翻译',
@@ -33,6 +39,14 @@ return [
         'clear' => '新对话',
         'close' => '关闭',
         'error' => '无法回答，请稍后再试。',
+        'mood' => [
+            'thinking' => '助手正在思考',
+            'happy' => '助手已回答',
+            'sorry' => '助手无法回答',
+            'search' => '助手正在查找记录',
+            'read' => '助手正在阅读指南',
+            'write' => 'AI 正在撰写文本',
+        ],
     ],
     'errors' => [
         'no_ai' => '此字段没有 AI 生成。',

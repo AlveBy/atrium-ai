@@ -8,6 +8,12 @@
 declare(strict_types=1);
 
 return [
+    'settings' => [
+        'module' => 'KI',
+        'description' => 'Wie der KI-Assistent in der Ecke des Panels aussieht.',
+        'playful' => 'Verspielter Assistent',
+        'playful_hint' => 'Augenbrauen, ein Lächeln und kleine Verwandlungen zeigen, was der Assistent gerade tut. Aus: der ruhige Bogen. So oder so meldet er sich nie von selbst.',
+    ],
     'ui' => [
         'generate' => 'Generieren',
         'translate' => 'Übersetzen',
@@ -33,6 +39,14 @@ return [
         'clear' => 'Neues Gespräch',
         'close' => 'Schließen',
         'error' => 'Ich konnte nicht antworten. Versuchen Sie es später erneut.',
+        'mood' => [
+            'thinking' => 'Der Assistent denkt nach',
+            'happy' => 'Der Assistent hat geantwortet',
+            'sorry' => 'Der Assistent konnte nicht antworten',
+            'search' => 'Der Assistent durchsucht die Einträge',
+            'read' => 'Der Assistent liest die Anleitungen',
+            'write' => 'Die KI schreibt einen Text',
+        ],
     ],
     'errors' => [
         'no_ai' => 'Für dieses Feld gibt es keine KI-Generierung.',

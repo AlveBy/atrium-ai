@@ -8,6 +8,12 @@
 declare(strict_types=1);
 
 return [
+    'settings' => [
+        'module' => 'AI',
+        'description' => 'Jak wygląda asystent AI w rogu panelu.',
+        'playful' => 'Wesoły asystent',
+        'playful_hint' => 'Brwi, uśmiech i drobne przebrania pokazują, czym zajmuje się asystent. Wyłączone: spokojny łuk. W żadnym wariancie nie wyskakuje ani nie odzywa się sam.',
+    ],
     'ui' => [
         'generate' => 'Wygeneruj',
         'translate' => 'Przetłumacz',
@@ -33,6 +39,14 @@ return [
         'clear' => 'Nowa rozmowa',
         'close' => 'Zamknij',
         'error' => 'Nie udało się odpowiedzieć. Spróbuj później.',
+        'mood' => [
+            'thinking' => 'Asystent myśli',
+            'happy' => 'Asystent odpowiedział',
+            'sorry' => 'Asystent nie zdołał odpowiedzieć',
+            'search' => 'Asystent przegląda wpisy',
+            'read' => 'Asystent czyta poradniki',
+            'write' => 'AI pisze tekst',
+        ],
     ],
     'errors' => [
         'no_ai' => 'To pole nie ma generowania przez AI.',

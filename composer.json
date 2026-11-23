@@ -41,7 +41,9 @@
     },
     "extra": {
         "atrium": {
-            "migrations": "database/migrations"
+            "migrations": "database/migrations",
+            "title": "atrium-ai::ai.settings.module",
+            "settings": "Atrium\\Ai\\AiSettings"
         },
         "laravel": {
             "providers": [

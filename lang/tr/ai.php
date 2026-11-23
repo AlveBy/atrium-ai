@@ -8,6 +8,12 @@
 declare(strict_types=1);
 
 return [
+    'settings' => [
+        'module' => 'Yapay zekâ',
+        'description' => 'Paneldeki köşede duran yapay zekâ asistanının görünümü.',
+        'playful' => 'Neşeli asistan',
+        'playful_hint' => 'Kaşlar, bir gülümseme ve küçük kılıklar asistanın ne yaptığını gösterir. Kapalıyken: sakin kemer. Her iki durumda da kendiliğinden açılmaz ve konuşmaz.',
+    ],
     'ui' => [
         'generate' => 'Oluştur',
         'translate' => 'Çevir',
@@ -33,6 +39,14 @@ return [
         'clear' => 'Yeni sohbet',
         'close' => 'Kapat',
         'error' => 'Yanıt veremedim. Daha sonra tekrar deneyin.',
+        'mood' => [
+            'thinking' => 'Asistan düşünüyor',
+            'happy' => 'Asistan yanıtladı',
+            'sorry' => 'Asistan yanıt veremedi',
+            'search' => 'Asistan kayıtlara bakıyor',
+            'read' => 'Asistan kılavuzları okuyor',
+            'write' => 'Yapay zekâ bir metin yazıyor',
+        ],
     ],
     'errors' => [
         'no_ai' => 'Bu alanda yapay zekâ ile oluşturma yok.',

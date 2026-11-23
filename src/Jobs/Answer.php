@@ -73,7 +73,7 @@ final class Answer implements ShouldQueue
             // Records of the other sites stay hidden, as in the admin.
             $sites->setCurrent(Site::query()->findOrFail($this->site));
             $user = AdminUser::query()->findOrFail($this->user);
-            $helper = new Helper($this->instructions($user), $this->tools($user), $this->messages());
+            $helper = new Helper($this->instructions($user), $this->tools($user), $this->messages(), $this->id);
             $response = $providers->ask('text', fn (array $chain): AgentResponse => $helper->prompt(
                 $this->question,
                 provider: $chain,

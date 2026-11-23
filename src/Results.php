@@ -47,6 +47,17 @@ final class Results
         $this->update($id, ['status' => 'done', ...$result->toArray()]);
     }
 
+    /**
+     * What a pending answer is doing now ("search", "read"), for the
+     * helper's face while the chat polls. A finished one is left alone.
+     */
+    public function step(string $id, string $step): void
+    {
+        if ((Cache::get($this->key($id))['status'] ?? null) === 'pending') {
+            $this->update($id, ['status' => 'pending', 'step' => $step]);
+        }
+    }
+
     public function failed(string $id, string $message): void
     {
         $this->update($id, ['status' => 'failed', 'message' => $message]);

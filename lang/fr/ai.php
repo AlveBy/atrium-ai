@@ -8,6 +8,12 @@
 declare(strict_types=1);
 
 return [
+    'settings' => [
+        'module' => 'IA',
+        'description' => 'L’apparence de l’assistant IA dans le coin du panneau.',
+        'playful' => 'Assistant enjoué',
+        'playful_hint' => 'Des sourcils, un sourire et de petits déguisements montrent ce que fait l’assistant. Désactivé : l’arche calme. Dans les deux cas, il ne surgit jamais et ne parle jamais de lui-même.',
+    ],
     'ui' => [
         'generate' => 'Générer',
         'translate' => 'Traduire',
@@ -33,6 +39,14 @@ return [
         'clear' => 'Nouvelle conversation',
         'close' => 'Fermer',
         'error' => 'Je n’ai pas pu répondre. Réessayez plus tard.',
+        'mood' => [
+            'thinking' => 'L’assistant réfléchit',
+            'happy' => 'L’assistant a répondu',
+            'sorry' => 'L’assistant n’a pas pu répondre',
+            'search' => 'L’assistant parcourt les fiches',
+            'read' => 'L’assistant lit les guides',
+            'write' => 'L’IA écrit un texte',
+        ],
     ],
     'errors' => [
         'no_ai' => 'Ce champ n’a pas de génération par IA.',

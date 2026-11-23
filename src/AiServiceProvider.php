@@ -9,12 +9,17 @@ declare(strict_types=1);
 
 namespace Atrium\Ai;
 
+use Atrium\Admin\Facades\Setting;
 use Atrium\Admin\Models\AdminUser;
 use Atrium\Admin\Modules\Modules;
+use Atrium\Ai\Agents\Helper;
 use Atrium\Ai\Console\StatusCommand;
+use Atrium\Ai\Help\Tools\SearchDocs;
 use Atrium\Ai\Mcp\GenerateText;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
+use Laravel\Ai\Events\InvokingTool;
 
 /**
  * The migration comes from the manifest in composer.json (`extra.atrium`)
@@ -58,6 +63,14 @@ final class AiServiceProvider extends ServiceProvider
 
         // Lazy: runs per page, after the admin is signed in.
         Inertia::share('ai', fn () => $this->client());
+
+        // The helper's face shows what it is doing while the chat waits: a
+        // magnifier over the records, glasses over the guides.
+        Event::listen(InvokingTool::class, function (InvokingTool $event): void {
+            if ($event->agent instanceof Helper && $event->agent->answer !== null) {
+                $this->app->make(Results::class)->step($event->agent->answer, $event->tool instanceof SearchDocs ? 'read' : 'search');
+            }
+        });
     }
 
     /**
@@ -85,10 +98,23 @@ final class AiServiceProvider extends ServiceProvider
             'help' => config('atrium-ai.help.enabled', true) ? [
                 'url' => route('admin.ai.help', [], false),
                 'labels' => trans('atrium-ai::ai.help'),
+                'playful' => Setting::get('ai.playful'),
+                'holiday' => $this->holiday(),
             ] : null,
             'tasks' => $tasks,
             'demo' => $this->app->make(DemoLimit::class)->active(),
             'labels' => trans('atrium-ai::ai.ui'),
         ];
+    }
+
+    /**
+     * The helper's costume of the day: a party hat around the New Year,
+     * from 24 December to 7 January.
+     */
+    private function holiday(): ?string
+    {
+        $day = now()->format('md');
+
+        return $day >= '1224' || $day <= '0107' ? 'new_year' : null;
     }
 }

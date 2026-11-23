@@ -28,11 +28,13 @@ final class Helper implements Agent, Conversational, HasTools
     /**
      * @param  list<Tool>  $tools
      * @param  list<Message>  $history  the conversation so far
+     * @param  string|null  $answer  the result its tool calls are reported to (Results::step)
      */
     public function __construct(
         private readonly string $instructions,
         private readonly array $tools = [],
         private readonly array $history = [],
+        public readonly ?string $answer = null,
     ) {}
 
     public function instructions(): string

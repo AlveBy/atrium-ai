@@ -8,6 +8,12 @@
 declare(strict_types=1);
 
 return [
+    'settings' => [
+        'module' => 'AI',
+        'description' => 'How the AI helper in the corner of the panel looks.',
+        'playful' => 'Playful helper',
+        'playful_hint' => 'Brows, a smile and small costumes show what the helper is doing. Off: the calm arch. Either way it never pops up or speaks on its own.',
+    ],
     'ui' => [
         'generate' => 'Generate',
         'translate' => 'Translate',
@@ -33,6 +39,14 @@ return [
         'clear' => 'New conversation',
         'close' => 'Close',
         'error' => 'I could not answer. Try again later.',
+        'mood' => [
+            'thinking' => 'The helper is thinking',
+            'happy' => 'The helper has answered',
+            'sorry' => 'The helper could not answer',
+            'search' => 'The helper is looking through the records',
+            'read' => 'The helper is reading the guides',
+            'write' => 'The AI is writing a text',
+        ],
     ],
     'errors' => [
         'no_ai' => 'This field has no AI generation.',

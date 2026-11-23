@@ -141,7 +141,7 @@ The answer is in the language of the question, whatever the language of the pane
 
 The record tools read through the API's own controller with the permissions of the administrator who asked: a module they may not view does not exist for the helper. No token is created.
 
-The answer is written after the response, like a generation, and the chat asks for it every second and a half. The conversation stays in the browser tab (the last 20 messages); the last 10 go with each question.
+The answer is written after the response, like a generation, and the chat asks for it every second and a half. While it waits, the answer reports the tool being called (`step`: `search` for the records, `read` for the guides). The arch shows it as a magnifier or glasses. It raises its brows while it thinks, smiles at the answer and looks sorry at an error. The setting `ai.playful` (**Modules → AI**, on by default) turns the moods off. The state is still announced to screen readers. The conversation stays in the browser tab (the last 20 messages); the last 10 go with each question.
 
 > **Privacy.** The question, the guide sections and the records the helper reads go to the provider of the `text` chain. With Gemini's free tier that means Google may read them. On a site with private data use Ollama or a paid key, or turn the helper off.
 

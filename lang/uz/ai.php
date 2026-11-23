@@ -8,6 +8,12 @@
 declare(strict_types=1);
 
 return [
+    'settings' => [
+        'module' => 'SI',
+        'description' => 'Panel burchagidagi SI yordamchisining ko‘rinishi.',
+        'playful' => 'Quvnoq yordamchi',
+        'playful_hint' => 'Qoshlar, tabassum va kichik o‘zgarishlar yordamchi nima qilayotganini ko‘rsatadi. O‘chirilganda — sokin arka. Har ikki holatda ham u o‘zi chiqib kelmaydi va gapirmaydi.',
+    ],
     'ui' => [
         'generate' => 'Yaratish',
         'translate' => 'Tarjima qilish',
@@ -33,6 +39,14 @@ return [
         'clear' => 'Yangi suhbat',
         'close' => 'Yopish',
         'error' => 'Javob bera olmadim. Keyinroq urinib ko‘ring.',
+        'mood' => [
+            'thinking' => 'Yordamchi o‘ylayapti',
+            'happy' => 'Yordamchi javob berdi',
+            'sorry' => 'Yordamchi javob bera olmadi',
+            'search' => 'Yordamchi yozuvlardan qidiryapti',
+            'read' => 'Yordamchi qo‘llanmani o‘qiyapti',
+            'write' => 'SI matn yozyapti',
+        ],
     ],
     'errors' => [
         'no_ai' => 'Bu maydonda SI bilan yaratish yo‘q.',

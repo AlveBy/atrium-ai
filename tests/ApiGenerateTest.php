@@ -58,6 +58,8 @@ final class ApiGenerateTest extends TestCase
             'a language code too long' => [['locale' => str_repeat('x', 21)] + $ok, 'locale'],
             'a locale that is not a text' => [['locale' => ['en']] + $ok, 'locale'],
             'a translate that is not a flag' => [['translate' => 'maybe'] + $ok, 'translate'],
+            'an improve that is not a flag' => [['improve' => 'maybe'] + $ok, 'improve'],
+            'a selection that is not a text' => [['selection' => ['a']] + $ok, 'selection'],
             'a field name too long' => [['field' => str_repeat('x', 101)] + $ok, 'field'],
             'a module name too long' => [['module' => str_repeat('x', 101)] + $ok, 'module'],
         ];
@@ -177,6 +179,45 @@ final class ApiGenerateTest extends TestCase
             ->assertJsonPath('data.values.de', 'Hallo');
     }
 
+    public function test_a_text_is_improved_from_the_saved_record(): void
+    {
+        $article = Article::query()->create(['name' => ['en' => 'Lake'], 'preview_text' => ['en' => 'Roms by the lake']]);
+        Writer::fake(['Rooms by the lake']);
+
+        $this->withToken($this->token())
+            ->postJson('/api/v1/ai/generate', ['module' => 'articles', 'field' => 'preview_text', 'id' => $article->id, 'improve' => true])
+            ->assertOk()
+            ->assertJsonPath('data.value', 'Rooms by the lake');
+
+        Writer::assertPrompted(fn (AgentPrompt $prompt): bool => str_contains($prompt->prompt, "Text:\nRoms by the lake"));
+        $this->assertSame(['en' => 'Roms by the lake'], $article->fresh()->getTranslations('preview_text'));
+    }
+
+    public function test_a_piece_of_the_text_is_improved_through_the_tool(): void
+    {
+        Writer::fake(['by the lake']);
+
+        $result = $this->mcp($this->token(), 'tools/call', ['name' => 'generate_text', 'arguments' => [
+            'module' => 'articles', 'field' => 'detail_text', 'improve' => true, 'selection' => 'bye the lake', 'values' => ['detail_text' => '<p>Rooms bye the lake</p>'],
+        ]])->json('result');
+
+        $this->assertFalse($result['isError'], (string) ($result['content'][0]['text'] ?? ''));
+        $this->assertSame('by the lake', json_decode($result['content'][0]['text'], true)['data']['value']);
+        Writer::assertPrompted(fn (AgentPrompt $prompt): bool => str_contains($prompt->prompt, "Text:\nbye the lake") && ! str_contains($prompt->prompt, 'Rooms'));
+    }
+
+    public function test_an_empty_field_is_told_there_is_nothing_to_improve(): void
+    {
+        Writer::fake(['Text'])->preventStrayPrompts();
+
+        $this->withToken($this->token())
+            ->postJson('/api/v1/ai/generate', ['module' => 'articles', 'field' => 'detail_text', 'improve' => true, 'values' => ['detail_text' => ' ']])
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.field.0', __('atrium-ai::ai.errors.no_source'));
+
+        Writer::assertNeverPrompted();
+    }
+
     public function test_the_generate_text_tool_passes_the_language_on(): void
     {
         Language::query()->create(['code' => 'de', 'name' => 'Deutsch', 'sort' => 200]);
@@ -200,7 +241,7 @@ final class ApiGenerateTest extends TestCase
         $token = $this->token();
 
         $tool = collect($this->mcp($token, 'tools/list')->json('result.tools'))->firstWhere('name', 'generate_text');
-        $this->assertEqualsCanonicalizing(['module', 'site', 'field', 'id', 'values', 'locale', 'translate'], array_keys($tool['inputSchema']['properties']));
+        $this->assertEqualsCanonicalizing(['module', 'site', 'field', 'id', 'values', 'locale', 'translate', 'improve', 'selection'], array_keys($tool['inputSchema']['properties']));
         $this->assertContains('module', $tool['inputSchema']['required']);
         $this->assertContains('field', $tool['inputSchema']['required']);
 

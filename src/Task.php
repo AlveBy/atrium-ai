@@ -32,6 +32,9 @@ enum Task: string
     /** The field's text in the site's other languages. */
     case Translate = 'translate';
 
+    /** The text already in the field (or a piece of it), corrected and made clearer. */
+    case Improve = 'improve';
+
     /**
      * Which provider chain answers: "text" or "vision".
      */

@@ -18,7 +18,7 @@ use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Attributes\Name;
 
 #[Name('generate_text')]
-#[Description('Have the site\'s own AI write a field the way the admin\'s "Generate" button does: a description, a preview text, SEO title/description/keywords, an image alt text, or a translation into the site\'s other languages. Nothing is saved: pass the text to update_record when it is good. Only fields that describe_module marks with "ai" can be generated.')]
+#[Description('Have the site\'s own AI write a field the way the admin\'s "Generate" button does: a description, a preview text, SEO title/description/keywords, an image alt text, or a translation into the site\'s other languages, or the text already in the field corrected and made clearer (improve). Nothing is saved: pass the text to update_record when it is good. Only fields that describe_module marks with "ai" can be generated.')]
 class GenerateText extends ApiTool
 {
     public function schema(JsonSchema $schema): array
@@ -30,6 +30,8 @@ class GenerateText extends ApiTool
             'values' => $schema->object()->description('Field values to use instead of (or without) the saved ones, e.g. {"name": "…"}.'),
             'locale' => $schema->string()->description('Language code to write in; the site\'s default language when omitted.'),
             'translate' => $schema->boolean()->description('Translate the field from "locale" into the site\'s other languages instead.'),
+            'improve' => $schema->boolean()->description('Correct and clarify the text the field already holds (spelling, punctuation, wording; the language and the HTML stay) instead of writing a new one.'),
+            'selection' => $schema->string()->description('With "improve": only this piece of the text is improved and returned.'),
         ];
     }
 
@@ -48,6 +50,8 @@ class GenerateText extends ApiTool
             'values' => $request->get('values'),
             'locale' => $request->get('locale'),
             'translate' => $request->get('translate'),
+            'improve' => $request->get('improve'),
+            'selection' => $request->get('selection'),
         ]);
     }
 }

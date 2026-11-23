@@ -23,6 +23,7 @@ final readonly class Brief
      * @param  int|null  $max  hard length of the field (TextField::maxLength)
      * @param  string|null  $image  absolute path of a local picture, for "alt"
      * @param  array<string,string>  $targets  "translate": language code => name
+     * @param  bool  $fragment  "improve": the source is a piece picked out of a longer text
      */
     public function __construct(
         public Task $task,
@@ -35,6 +36,7 @@ final readonly class Brief
         public array $targets = [],
         public ?string $module = null,
         public ?int $user = null,
+        public bool $fragment = false,
     ) {}
 
     /** How many times the provider is asked: once, or once per language of a translation. */

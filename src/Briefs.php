@@ -34,11 +34,17 @@ final class Briefs
     /**
      * @param  class-string<Model>  $model
      * @param  array<string,mixed>  $values  field name => value as the form holds it
+     * @param  bool  $improve  correct the text that is in the field instead of writing one
+     * @param  string|null  $selection  with $improve: the piece of the text picked out in the editor
      *
      * @throws ValidationException when the field has no AI or there is nothing to work from
      */
-    public function make(string $model, string $name, array $values, ?string $locale = null, bool $translate = false, ?string $module = null, ?int $user = null): Brief
+    public function make(string $model, string $name, array $values, ?string $locale = null, bool $translate = false, ?string $module = null, ?int $user = null, bool $improve = false, ?string $selection = null): Brief
     {
+        if ($improve && $translate) {
+            throw ValidationException::withMessages(['improve' => __('validation.prohibits', ['attribute' => 'improve', 'other' => 'translate'])]);
+        }
+
         $fields = $this->fields($model);
         $field = $fields[$name] ?? null;
         $ai = $field !== null && method_exists($field, 'getAi') ? $field->getAi() : null;
@@ -52,6 +58,10 @@ final class Briefs
         $format = $field instanceof ContentField ? 'html' : 'text';
         $max = $this->maxLength($field);
         $common = ['field' => $field->getLabel() ?: $name, 'format' => $format, 'max' => $max, 'module' => $module, 'user' => $user];
+
+        if ($improve) {
+            return $this->improvement($field, $task, $values, $language, $common, $selection);
+        }
 
         if ($task === Task::Translate) {
             return $this->translation($model, $field, $values, $language, $common);
@@ -80,6 +90,37 @@ final class Briefs
         }
 
         return new Brief($task, $language, $sources, ...$common);
+    }
+
+    /**
+     * The text of the field as it stands (or the piece picked out of it), to be
+     * corrected. The result goes back where the text came from, so a text too
+     * long to be sent whole is refused instead of cut.
+     *
+     * @param  array<string,mixed>  $values
+     * @param  array<string,mixed>  $common
+     */
+    private function improvement(Field $field, Task $task, array $values, string $language, array $common, ?string $selection): Brief
+    {
+        $piece = $selection !== null && trim($selection) !== '' ? $selection : null;
+        $fragment = $piece !== null;
+        $raw = $piece ?? $this->raw($values[$field->getName()] ?? null, $language, strict: true);
+        $text = $this->clean($raw, $common['format'] === 'html');
+
+        // Tags alone (an empty paragraph) are no text.
+        if ($this->clean($raw, false) === '') {
+            throw ValidationException::withMessages(['field' => __('atrium-ai::ai.errors.no_source')]);
+        }
+
+        if (mb_strlen(trim($raw)) > $this->sourceLength()) {
+            throw ValidationException::withMessages(['field' => __('atrium-ai::ai.errors.too_long')]);
+        }
+
+        // The whole text keeps the limits of the field; a piece has none of its own.
+        $limits = array_filter([$common['max'], $task->limit()], static fn (?int $limit): bool => $limit !== null);
+        $common['max'] = $fragment || $limits === [] ? null : min($limits);
+
+        return new Brief(Task::Improve, $language, [$common['field'] => $text], ...$common, fragment: $fragment);
     }
 
     /**
@@ -149,22 +190,37 @@ final class Briefs
      */
     private function text(mixed $value, string $language, bool $keepHtml, bool $strict = false): string
     {
-        if (is_array($value)) {
-            $value = $value[$language] ?? ($strict ? null : ($value[$this->languages->default()] ?? collect($value)->first(fn ($item): bool => is_string($item) && trim($item) !== '')));
-        }
+        return $this->clean($this->raw($value, $language, $strict), $keepHtml);
+    }
 
-        if (! is_string($value) && ! is_numeric($value)) {
-            return '';
-        }
-
-        $text = (string) $value;
-
+    /**
+     * A string ready for a prompt: plain text unless $keepHtml, trimmed and cut.
+     */
+    private function clean(string $text, bool $keepHtml): string
+    {
         if (! $keepHtml) {
             $text = html_entity_decode(strip_tags(str_replace(['<br>', '<br/>', '<br />', '</p>', '</li>'], "\n", $text)), ENT_QUOTES | ENT_HTML5);
             $text = (string) preg_replace(['/[ \t]+/u', '/\n\s*\n+/u'], [' ', "\n\n"], $text);
         }
 
-        return mb_substr(trim($text), 0, max(100, (int) config('atrium-ai.max_source_length', 6000)));
+        return mb_substr(trim($text), 0, $this->sourceLength());
+    }
+
+    /**
+     * The value as one string, as the form holds it: no tags removed, nothing cut.
+     */
+    private function raw(mixed $value, string $language, bool $strict): string
+    {
+        if (is_array($value)) {
+            $value = $value[$language] ?? ($strict ? null : ($value[$this->languages->default()] ?? collect($value)->first(fn ($item): bool => is_string($item) && trim($item) !== '')));
+        }
+
+        return is_string($value) || is_numeric($value) ? (string) $value : '';
+    }
+
+    private function sourceLength(): int
+    {
+        return max(100, (int) config('atrium-ai.max_source_length', 6000));
     }
 
     private function maxLength(Field $field): ?int

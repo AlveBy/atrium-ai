@@ -6,6 +6,7 @@ AI writing help for the [Atrium](https://github.com/AlveBy/atrium) admin, on top
 - a short preview text from the long one;
 - the SEO title, description and keywords from the text;
 - the alt text of a picture (the model looks at the image);
+- a corrected version of a text the editor has already written: spelling, punctuation, clarity, the same language and the same HTML (**Improve**, the whole field or only the selected piece);
 - a translation of the field into the site's other content languages (**Translate**).
 
 The text comes up in a dialog. The editor reads it, edits it and either puts it into the field or cancels. The AI never saves anything: the record changes only when the editor presses **Save**.
@@ -57,9 +58,13 @@ TextField::make('picture_alt')->label('Picture alt')->ai('alt', from: 'picture')
 | `seo_keywords` | Comma-separated keywords | `from`, or the form |
 | `alt` | Up to 125 characters | The image field in `from` |
 
-The SEO fields of `HasAdminSeo` (title, description, keywords, picture alt) have it already. A field with `maxLength()` gets no more than that. A `ContentField` gets simple HTML, other fields plain text. When the fields in `from` are empty, the rest of the form is used.
+Out of the box the buttons are on the texts the site's editors write: the description of a product, a catalog section, a brand, a news item, an article, a store, a team member (the preview from the full text) and a page, a FAQ answer (from the question) and the SEO fields of `HasAdminSeo` (title, description, keywords, picture alt). Not on visitors' texts (reviews, form submissions) or technical fields (head code, `robots.txt`, recipients, options). The Bitrix and WordPress generators emit `->ai()` on the preview, detail and description fields they make. A field with `maxLength()` gets no more than that. A `ContentField` gets simple HTML, other fields plain text. When the fields in `from` are empty, the rest of the form is used.
 
 The fields are read as they are in the form now, not as saved, so a new record works too. Unless a field names them in `from`, codes, e-mails, phone numbers, web addresses and passwords never go into a prompt. The field and its task come from the model, never from the browser.
+
+**Improve** (`improve`) shows on every field with `->ai()` that is not empty. It takes the field's text as it is in the form now, with no `from` and no other fields, and returns it corrected, in the language it is written in (not the language being edited), with the same HTML and no new facts. A text longer than `max_source_length` is refused with a message instead of being cut, and a plain field's `maxLength()` and the task's limit apply to the result.
+
+In the visual editor of a `ContentField` the buttons are in the editor's toolbar, behind a sparkle button: **Generate**, **Improve** and **Translate** (the links under the field are hidden there, so the actions are not shown twice). With a piece of text selected it reads **Improve the selection**: only that piece is sent (as inline HTML when it lies inside one paragraph, as whole blocks otherwise), it has no length limit of its own, and only it is replaced when the editor accepts. Text and Textarea fields and the Text and HTML modes of a content field keep the links under the field: **Generate · Improve · Translate**.
 
 **Translate** shows on a translatable field when the site has more than one content language. It translates the language being edited into every other one and shows them all in the dialog. A language cleared there keeps its old text.
 
@@ -155,7 +160,7 @@ Each task's prompt is a Blade view. Publish them and edit:
 php artisan vendor:publish --tag=atrium-ai-prompts
 ```
 
-They land in `resources/views/vendor/atrium-ai/prompts`. Or point a task at a view of your own in `config/atrium-ai.php` → `prompts`. A view gets `$field` (the field's label), `$sources` (label → text), `$text` (all of them as one text), `$language` ("English (en)", "Uzbek in Latin script (Oʻzbekcha, uz)"), `$html`, `$limit` and, for `translate`, `$target`. `system` is the instruction every task starts with.
+They land in `resources/views/vendor/atrium-ai/prompts`. Or point a task at a view of your own in `config/atrium-ai.php` → `prompts`. A view gets `$field` (the field's label), `$sources` (label → text), `$text` (all of them as one text), `$language` ("English (en)", "Uzbek in Latin script (Oʻzbekcha, uz)"), `$html`, `$limit` and, for `translate`, `$target`; for `improve`, `$fragment` is true when only a selected piece of the text is sent. `system` is the instruction every task starts with.
 
 ## The helper
 
@@ -195,9 +200,9 @@ curl -X POST https://example.com/api/v1/ai/generate \
   -d '{"module": "products", "field": "preview_text", "id": 7}'
 ```
 
-With `id` the saved record is used; `values` overrides fields; `locale` and `translate` work as in the admin. The answer is `{"data": {"value": "…", "provider": "gemini", "model": "…"}}`, or `{"data": {"values": {"de": "…"}}}` for a translation. Nothing is saved.
+With `id` the saved record is used; `values` overrides fields; `locale` and `translate` work as in the admin. `"improve": true` improves the field's current text instead of writing it (from the record or from `values`), and `"selection"` limits that to a piece of the text, which then comes back alone; `improve` cannot be combined with `translate`, and an empty field answers 422. The answer is `{"data": {"value": "…", "provider": "gemini", "model": "…"}}`, or `{"data": {"values": {"de": "…"}}}` for a translation. Nothing is saved.
 
-An AI assistant connected to `/mcp` gets the same as the `generate_text` tool.
+An AI assistant connected to `/mcp` gets the same as the `generate_text` tool, with `improve` and `selection`.
 
 ## Public demo
 

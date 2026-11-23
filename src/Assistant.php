@@ -72,7 +72,7 @@ final class Assistant
         $started = now();
 
         try {
-            $response = $this->providers->ask($brief->task->kind(), fn (array $chain): AgentResponse => (new Writer($this->system($language)))->prompt(
+            $response = $this->providers->ask($brief->task->kind(), fn (array $chain): AgentResponse => (new Writer($this->system($language, $brief->task)))->prompt(
                 $prompt,
                 $attachments,
                 provider: $chain,
@@ -107,14 +107,16 @@ final class Assistant
             'text' => implode("\n\n", $brief->sources),
             'language' => $this->languageName($brief->language),
             'html' => $brief->format === 'html',
+            'fragment' => $brief->fragment,
             'limit' => $limits === [] ? null : min($limits),
             ...$extra,
         ])->render());
     }
 
-    private function system(string $language): string
+    private function system(string $language, Task $task): string
     {
         return trim(view($this->view('system'), [
+            'task' => $task,
             'site' => app(Sites::class)->current()->name,
             'language' => $this->languageName($language),
         ])->render());

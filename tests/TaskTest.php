@@ -27,6 +27,7 @@ final class TaskTest extends TestCase
             'seo keywords' => [Task::SeoKeywords, 255, 'text'],
             'alt' => [Task::Alt, 125, 'vision'],
             'translate' => [Task::Translate, null, 'text'],
+            'improve' => [Task::Improve, null, 'text'],
         ];
     }
 

@@ -53,7 +53,7 @@ final class ButtonsTest extends TestCase
         $this->assertNotContains('alt', $page['props']['ai']['tasks']);
         $this->assertContains('translate', $page['props']['ai']['tasks']);
         // A list, not a list with a gap where the task was.
-        $this->assertSame(['describe', 'preview', 'seo_title', 'seo_description', 'seo_keywords', 'translate'], $page['props']['ai']['tasks']);
+        $this->assertSame(['describe', 'preview', 'seo_title', 'seo_description', 'seo_keywords', 'translate', 'improve'], $page['props']['ai']['tasks']);
     }
 
     public function test_switched_off_no_buttons(): void

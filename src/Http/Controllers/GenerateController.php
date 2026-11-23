@@ -42,6 +42,8 @@ final class GenerateController extends Controller
             'values' => ['nullable', 'array'],
             'locale' => ['nullable', 'string', 'max:20'],
             'translate' => ['nullable', 'boolean'],
+            'improve' => ['nullable', 'boolean'],
+            'selection' => ['nullable', 'string', 'max:100000'],
         ]);
 
         $user = $request->user(config('atrium.auth.guard', 'admin'));
@@ -59,6 +61,8 @@ final class GenerateController extends Controller
             (bool) ($data['translate'] ?? false),
             $data['module'],
             $owner,
+            (bool) ($data['improve'] ?? false),
+            $data['selection'] ?? null,
         );
 
         $this->limit->claim($brief->calls());

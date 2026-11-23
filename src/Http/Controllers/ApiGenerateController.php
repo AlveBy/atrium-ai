@@ -43,6 +43,8 @@ final class ApiGenerateController extends Controller
             'values' => ['nullable', 'array'],
             'locale' => ['nullable', 'string', 'max:20'],
             'translate' => ['nullable', 'boolean'],
+            'improve' => ['nullable', 'boolean'],
+            'selection' => ['nullable', 'string', 'max:100000'],
         ]);
 
         $module = $data['module'];
@@ -54,7 +56,7 @@ final class ApiGenerateController extends Controller
         abort_unless(GenerateController::mayWrite($owner, $module), 403, "The token owner lacks the {$module}.update permission.");
 
         $values = [...$this->stored($model, $data['id'] ?? null), ...($data['values'] ?? [])];
-        $brief = $this->briefs->make($model, $data['field'], $values, $data['locale'] ?? null, (bool) ($data['translate'] ?? false), $module, (int) $owner->getKey());
+        $brief = $this->briefs->make($model, $data['field'], $values, $data['locale'] ?? null, (bool) ($data['translate'] ?? false), $module, (int) $owner->getKey(), (bool) ($data['improve'] ?? false), $data['selection'] ?? null);
 
         $this->limit->claim($brief->calls());
 

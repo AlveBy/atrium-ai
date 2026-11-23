@@ -50,6 +50,14 @@ final class HelpDocsTest extends HelpTestCase
         $this->assertSame(['Zebra'], $this->found('guide zebra', 'en'));
     }
 
+    public function test_cyrillic_headings_are_not_cut_in_the_middle_of_a_letter(): void
+    {
+        // The second byte of "х" (D1 85) is NEL to a byte-wise \R.
+        $this->guides(['guide.md' => "# Двухфакторный вход\r\n## Ключ на телефоне\rСухие цифры.\n## Вход через соцсети\nТекст."]);
+
+        $this->assertSame(['Двухфакторный вход — Ключ на телефоне', 'Двухфакторный вход — Вход через соцсети'], app(Docs::class)->headings('en'));
+    }
+
     public function test_a_heading_that_is_used_twice_is_listed_once(): void
     {
         $this->guides(['guide.md' => "# Guide\n## Same\nOne.\n## Same\nTwo.\n## Other\nThree."]);

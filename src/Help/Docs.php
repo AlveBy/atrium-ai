@@ -80,7 +80,7 @@ final class Docs
                 $lines = [];
             };
 
-            foreach (preg_split('/\R/', (string) file_get_contents($path)) ?: [] as $line) {
+            foreach (preg_split('/\r\n|\r|\n/', (string) file_get_contents($path)) ?: [] as $line) {
                 if (preg_match('/^(#{1,3})\s+(.+)/', $line, $match)) {
                     $flush();
 

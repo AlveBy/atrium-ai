@@ -22,7 +22,7 @@
     "require": {
         "php": "^8.3",
         "illuminate/support": "^13.0",
-        "alveby/atrium": "^0.1",
+        "alveby/atrium": "^0.2",
         "laravel/ai": "^1.4"
     },
     "require-dev": {
@@ -51,7 +51,7 @@
             ]
         },
         "branch-alias": {
-            "dev-main": "0.1.x-dev"
+            "dev-main": "0.2.x-dev"
         }
     },
     "minimum-stability": "dev",
